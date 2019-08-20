@@ -1,11 +1,16 @@
 //
 // Created by yalavrinenko on 03.04.19.
 //
+#include "src/drifting_hulk.hpp"
 #include "src/void_display.hpp"
 #include "src/void_map.hpp"
-#include "src/drifting_hulk.hpp"
 #include <filesystem>
+#include <future>
 #include <random>
+
+#include "src/logger_factory.hpp"
+#include "src/ships/tank/battery.hpp"
+#include "src/ships/tank/fuel_tank.hpp"
 
 class Random{
 public:
@@ -24,6 +29,7 @@ private:
 using namespace std::chrono_literals;
 
 int main(int argc,char** argv){
+
   std::filesystem::create_directories("./logs");
   auto void_d = std::make_unique<void_display>("./logs/void.map");
 
@@ -42,5 +48,9 @@ int main(int argc,char** argv){
   });
   space.run();
   t.join();
+
+  logger_factory factory("../ram");
+
+
   return 0;
 }

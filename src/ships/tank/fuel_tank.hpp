@@ -1,27 +1,16 @@
 //
-// Created by yalavrinenko on 07.04.19.
+// Created by yalavrinenko on 03.06.19.
 //
 
 #ifndef DSCS_FUEL_TANK_HPP
 #define DSCS_FUEL_TANK_HPP
-#include "../component.hpp"
 
-class fuel_tank: public icomponent{
+#include "iaccumalative_container.hpp"
+
+class fuel_tank: public iaccumalative_container{
 public:
-  fuel_tank(double fuel, double mass): icomponent(mass), fuel_mass(fuel){
-  }
-
-  void action() override {
-  }
-
-  double mass() const override { return icomponent::mass() + fuel_mass; }
-
-  double pull(double q) {
-     auto out = (q  < fuel_mass) ? q : fuel_mass;
-  }
-
-protected:
-  double fuel_mass;
+  fuel_tank(double max_capacity, double mass)
+      : iaccumalative_container(max_capacity, mass) {}
 };
 
-#endif // DSCS_FUEL_TANK_HPP
+#endif //DSCS_FUEL_TANK_HPP
