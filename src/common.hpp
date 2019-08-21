@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread>
 #include <fstream>
+#include <cmath>
 using namespace std::chrono_literals;
 
 struct timestamp{
@@ -65,10 +66,23 @@ struct vector_2d{
     return {this->x * v, this->y * v};
   }
 
+  vector_2d operator*(vector_2d const &v){
+    return {this->x * v.x, this->y * v.y};
+  }
+
   vector_2d operator/ (double v){
     return *this * (1.0 / v);
   }
 
+  void norm() {
+    auto l = len();
+    x /= l;
+    y /= l;
+  }
+
+  double len(){
+    return std::sqrt(x*x + y*y);
+  }
 
   double x{0}, y{0};
 };

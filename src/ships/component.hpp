@@ -9,8 +9,6 @@
 
 class icomponent{
 public:
-  icomponent() = default;
-
   icomponent(double mass, std::string name, plogger &&logger)
       : mass_(mass), logger_(std::move(logger)), name_(std::move(name)) {}
 
