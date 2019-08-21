@@ -15,7 +15,6 @@ public:
         mass_pp_(mass_pp){}
 
   void action() override {
-    consumption_ = 0;
   }
 
   [[nodiscard]]
@@ -24,15 +23,16 @@ public:
   virtual double pull(double q) {
     auto out = (q < fuel_mass_) ? q : fuel_mass_;
     fuel_mass_ -= out;
-    consumption_ = -out;
+    consumption_ += -out;
     return out;
   }
 
   virtual double push(double q) {
     auto old_mass = fuel_mass_;
+    q = (fuel_mass_ + q > MAX_CAPACITY_) ? MAX_CAPACITY_ - fuel_mass_ : q;
     fuel_mass_ += q;
-    fuel_mass_ = (fuel_mass_ < MAX_CAPACITY_) ? fuel_mass_ : MAX_CAPACITY_;
-    consumption_ = q;
+
+    consumption_ += q;
 
     return fuel_mass_ - old_mass;
   }
@@ -43,12 +43,16 @@ public:
     this->logger()->log(this->name() + ":");
     this->logger()->log("\t(left/total/consumption)", "(", fuel_mass_, "/", MAX_CAPACITY_, "/", consumption_, ")");
     this->logger()->log("\tMass:", this->mass());
+    consumption_ = 0.0;
   }
 
+  double capacity() const { return fuel_mass_;  }
+
+  double max_capacity() const { return MAX_CAPACITY_; }
 protected:
   double fuel_mass_{0};
   double const MAX_CAPACITY_;
-  double consumption_{0};
+  mutable double consumption_{0};
   double mass_pp_;
 
 };

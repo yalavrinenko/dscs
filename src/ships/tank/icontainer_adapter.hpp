@@ -15,7 +15,23 @@ public:
   itank_adapter(double mass, double input_power, double output_power, std::string name, plogger logger)
       : icomponent(mass, std::move(name), std::move(logger)), MAX_INPUT(input_power), MAX_OUTPUT(output_power) {}
 
-  void action() override {}
+
+  void action() override {
+    for (auto &in : inputs)
+      in->action();
+  }
+
+  double capacity() const {
+    return std::accumulate(inputs.begin(), inputs.end(), 0.0, [](auto sum, auto &v){
+      return sum + v->capacity();
+    });
+  }
+
+  double max_capacity() const {
+    return std::accumulate(inputs.begin(), inputs.end(), 0.0, [](auto sum, auto &v){
+      return sum + v->max_capacity();
+    });
+  }
 
   [[nodiscard]]
   double mass() const override {
@@ -73,4 +89,6 @@ private:
   double const MAX_OUTPUT;
 };
 
+template<class tank_type>
+using ptank_adapter = std::shared_ptr<itank_adapter<tank_type>>;
 #endif // DSCS_ICONTAINER_ADAPTER_HPP

@@ -37,4 +37,5 @@ private:
 };
 
 using pcomponent = std::unique_ptr<icomponent>;
+using pscomponent = std::shared_ptr<icomponent>;
 #endif // DSCS_COMPONENT_HPP

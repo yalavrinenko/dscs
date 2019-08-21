@@ -36,3 +36,6 @@ target_link_libraries(fuel-test libgtest libgmock pthread stdc++fs logger)
 
 add_executable(adapter adapter.cpp)
 target_link_libraries(adapter libgtest libgmock pthread stdc++fs logger)
+
+add_executable(reactor reactor.cpp)
+target_link_libraries(reactor libgtest libgmock pthread stdc++fs logger dscs-lib)
