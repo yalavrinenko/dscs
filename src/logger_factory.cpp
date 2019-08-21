@@ -17,7 +17,7 @@ void logger_factory::flush_loggers() {
 }
 
 logger_factory::entry_info::entry_info(std::string const &name, size_t size): memsize(size) {
-  user_entry = std::make_shared<logger_entry>();
+  user_entry = std::make_shared<logger_entry>(name);
   file_descr = create_shared_file(name, memsize);
   memptr = static_cast<uint8_t *>(
       mmap(nullptr, memsize, PROT_READ | PROT_WRITE, MAP_SHARED, file_descr, 0)
@@ -41,8 +41,8 @@ int logger_factory::entry_info::create_shared_file(std::string const &name,
 }
 
 void logger_factory::entry_info::flush() {
-  std::string str = this->user_entry->get_buffer().str();
-  std::copy(str.begin(),str.end(), this->memptr);
+  std::string str = this->user_entry->get_buffer().str() + "EOF";
+  std::copy(str.begin(), str.end(), this->memptr);
   this->user_entry->clear();
   msync(memptr, memsize, MS_SYNC);
 }

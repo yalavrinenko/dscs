@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <filesystem>
+#include <iostream>
 
 class logger_sharedfs_error: std::exception{
 public:
@@ -53,25 +54,47 @@ protected:
 
 class logger_entry{
 public:
+  explicit logger_entry(std::filesystem::path path): linked_path_(std::move(path)){}
+
   template <class TArg>
   void log(TArg const &arg){
-    buffer << arg << " ";
+    log_impl(arg, "\n");
   }
 
   template <class TArg, class ... TArgs>
   void log(TArg const &arg1, TArgs ... args){
-    log(arg1);
-    log(args...);
+    log_impl(arg1, args..., "\n");
   }
 
+  auto const& linked_path() const {
+    return linked_path_;
+  }
+
+  ~logger_entry(){
+    std::filesystem::remove(linked_path());
+  }
 protected:
+  template <class TArg>
+  void log_impl(TArg const &arg){
+    buffer << arg << " ";
+  }
+
+  template <class TArg, class ... TArgs>
+  void log_impl(TArg const &arg1, TArgs ... args){
+    log_impl(arg1);
+    log_impl(args...);
+  }
+
   void clear(){
     buffer.clear();
+    buffer.str(std::string{});
   }
 
   auto& get_buffer() const {return buffer;  }
 
   std::ostringstream buffer;
+
+  std::filesystem::path const linked_path_;
 
   friend logger_factory;
 };

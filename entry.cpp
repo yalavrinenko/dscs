@@ -11,6 +11,8 @@
 #include "src/logger_factory.hpp"
 #include "src/ships/tank/battery.hpp"
 #include "src/ships/tank/fuel_tank.hpp"
+#include "src/ships/tank/battery_adapter.hpp"
+#include "src/ships/tank/fuel_adapter.hpp"
 
 class Random{
 public:
@@ -50,7 +52,6 @@ int main(int argc,char** argv){
   t.join();
 
   logger_factory factory("../ram");
-
 
   return 0;
 }

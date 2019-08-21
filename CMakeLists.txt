@@ -15,8 +15,13 @@ set(SRC entry.cpp src/void_map.cpp src/void_map.hpp
         src/ships/component.hpp
         src/ships/tank/battery.hpp
         src/ships/power/reactor.hpp
-        src/ships/tank/iaccumalative_container.hpp src/ships/tank/icontainer_adapter.cpp src/ships/tank/icontainer_adapter.hpp src/logger_factory.cpp src/logger_factory.hpp)
+        src/ships/tank/iaccumalative_container.hpp src/ships/tank/icontainer_adapter.cpp src/ships/tank/icontainer_adapter.hpp)
+
+add_library(logger src/logger_factory.cpp src/logger_factory.hpp)
+target_link_libraries(logger stdc++fs)
+
+add_subdirectory(tests)
 
 add_executable(dscs ${SRC})
 
-target_link_libraries(dscs stdc++fs pthread)
+target_link_libraries(dscs stdc++fs pthread logger)

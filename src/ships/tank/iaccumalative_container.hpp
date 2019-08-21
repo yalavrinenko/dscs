@@ -8,29 +8,49 @@
 
 class iaccumalative_container : public icomponent {
 public:
-  iaccumalative_container(double max_capacity, double mass)
-      : icomponent(mass), MAX_CAPACITY(max_capacity) {}
+  iaccumalative_container(double max_capacity, double mass, double mass_pp, std::string name,
+                          plogger logger)
+      : icomponent(mass, std::move(name), std::move(logger)),
+        MAX_CAPACITY_(max_capacity),
+        mass_pp_(mass_pp){}
 
-  void action() override {}
+  void action() override {
+    consumption_ = 0;
+  }
 
-  double mass() const override { return icomponent::mass() + fuel_mass; }
+  [[nodiscard]]
+  double mass() const override { return icomponent::mass() + fuel_mass_ * mass_pp_; }
 
   virtual double pull(double q) {
-    auto out = (q < fuel_mass) ? q : fuel_mass;
-    fuel_mass -= out;
+    auto out = (q < fuel_mass_) ? q : fuel_mass_;
+    fuel_mass_ -= out;
+    consumption_ = -out;
     return out;
   }
 
-  virtual void push(double q) {
-    fuel_mass += q;
-    fuel_mass = (fuel_mass < MAX_CAPACITY) ? fuel_mass : MAX_CAPACITY;
+  virtual double push(double q) {
+    auto old_mass = fuel_mass_;
+    fuel_mass_ += q;
+    fuel_mass_ = (fuel_mass_ < MAX_CAPACITY_) ? fuel_mass_ : MAX_CAPACITY_;
+    consumption_ = q;
+
+    return fuel_mass_ - old_mass;
   }
 
-  virtual double state() { return fuel_mass; }
+  virtual double size() { return fuel_mass_; }
+
+  void log_action() const override {
+    this->logger()->log(this->name() + ":");
+    this->logger()->log("\t(left/total/consumption)", "(", fuel_mass_, "/", MAX_CAPACITY_, "/", consumption_, ")");
+    this->logger()->log("\tMass:", this->mass());
+  }
 
 protected:
-  double fuel_mass{0};
-  double const MAX_CAPACITY;
+  double fuel_mass_{0};
+  double const MAX_CAPACITY_;
+  double consumption_{0};
+  double mass_pp_;
+
 };
 
 using piacc_container = std::shared_ptr<iaccumalative_container>;
