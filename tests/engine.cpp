@@ -49,7 +49,7 @@ TEST(adapters, evolution_with_wire){
     0.1,
     {electric_wire, engine_pipe},
     1.0,
-    5.0,
+    2.0,
     0.01,
     1.0
   };
@@ -58,12 +58,21 @@ TEST(adapters, evolution_with_wire){
 
   std::vector<pscomponent> components{fuel_line, engine_fuel, general_battery_line, power_unit, engine};
 
+  auto is_ignite = false;
   for (auto i = 0; i < 200000; ++i){
     if (i == 10)
       power_unit->ignite();
 
-    if (i == 100)
+    if (i == 0)
       engine->align({1, 1});
+
+    if (!std::isnan(engine->align_angle()) && engine->align_angle() < 1.0 && !is_ignite && i > 500) {
+      engine->ignite();
+      is_ignite = true;
+    }
+
+    if (i > 500 && power_unit->state() == reactor_state::shutdown)
+      power_unit->ignite();
 
     for (auto &component: components)
       component->action();

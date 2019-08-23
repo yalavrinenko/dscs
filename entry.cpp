@@ -51,7 +51,7 @@ int main(int argc,char** argv){
   space.run();
   t.join();
 
-  logger_factory factory("../ram");
+  logger_factory factory("../ramfs");
 
   return 0;
 }

@@ -19,7 +19,7 @@ struct engine_option{
   } inputs;
 
   double fuel_consumption_per_thrust;
-  double power_consumption_per_thrust;
+  double power_consumption_per_fuel;
 
   double thrust_align_speed;
   double align_charge;
@@ -61,13 +61,16 @@ public:
     return std::acos(cos) * 180.0 / M_PI;
   }
 
+  vector_2d const& thrust_direction() const { return current_thrust_direction_; }
+
+  double thrust() const {return current_thrust_; }
 protected:
   virtual void align_engine();
 
   engine_option option_;
 
   double current_thrust_{0};
-  engine_state current_state_{0};
+  engine_state current_state_ = engine_state::disable;
 
   mutable double current_fuel_comsumption_{0};
   mutable double current_power_consumption_{0};

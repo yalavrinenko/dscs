@@ -6,9 +6,35 @@
 void iengine::action() {
   if (align_angle() != 0)
     align_engine();
+
+  if (engine_state::active == current_state_){
+    current_thrust_ += option_.ignition_speed;
+    if (current_thrust_ > option_.max_thrust)
+      current_thrust_ = option_.max_thrust;
+
+    auto required_fuel = current_thrust_ * option_.fuel_consumption_per_thrust;
+    auto fuel = option_.inputs.fuel_supply.pull(required_fuel);
+
+    current_fuel_comsumption_ += fuel;
+
+    auto required_charde = fuel * option_.power_consumption_per_fuel;
+    auto charge = option_.inputs.energy_supply.pull(required_charde);
+
+    current_power_consumption_ += charge;
+
+    current_thrust_ = fuel * (1.0 / option_.fuel_consumption_per_thrust) * (charge / required_charde);
+
+    if (std::isnan(current_thrust_))
+      current_thrust_ = 0;
+
+  } else {
+    current_thrust_ = 0;
+  }
 }
+
 void iengine::log_action() const {
   logger()->log("Engine [", name(),"]:");
+  logger()->log("\tState:", (current_state_ == engine_state::active) ? "Active" : "Disable");
   logger()->log("\tFuel consumption:", current_fuel_comsumption_);
   logger()->log("\tPower consumption:", current_power_consumption_);
   logger()->log("\tCurrent thrust:", current_thrust_);

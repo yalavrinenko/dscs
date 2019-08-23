@@ -72,6 +72,8 @@ public:
     state_ = reactor_state ::shutdown;
   }
 
+  reactor_state state() const { return state_; }
+
   virtual ~reactor();
 protected:
   virtual void ignite_action();
