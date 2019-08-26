@@ -66,6 +66,14 @@ public:
 
   double mass() const override { return icomponent::mass() + apu_->mass(); }
 
+  double set_max_power(double new_power_level) {
+    auto old_level = option_.peak_output;
+    option_.peak_output = new_power_level;
+    if (option_.peak_output > 2.0 * initial_max_output_power_)
+      option_.peak_output = initial_max_output_power_ * 2.0;
+    return old_level;
+  }
+
   virtual void ignite();
 
   virtual void shutdown(){
@@ -92,6 +100,8 @@ protected:
   reactor_state state_{reactor_state::shutdown};
 
   std::vector<pscomponent> components_;
+
+  double const initial_max_output_power_;
 };
 
 #endif // DSCS_REACTOR_HPP

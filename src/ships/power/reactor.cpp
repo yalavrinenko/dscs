@@ -50,7 +50,8 @@ void reactor::log_action() const  {
 }
 
 reactor::reactor(double mass, reactor_option const &option,
-                 std::string const &name, plogger logger) : icomponent(mass, "Reactor " + name, std::move(logger)), option_(option) {
+                 std::string const &name, plogger logger) : icomponent(mass, "Reactor " + name, std::move(logger)), option_(option),
+                 initial_max_output_power_{option_.peak_output}{
   apu_ = std::make_shared<battery_line>(option_.apu.mass, option_.apu.in_power, option.apu.out_power, "APU Line", this->logger());
   apu_->add_tank(option_.apu.capacity, option_.apu.mass);
   while (apu_->push(option_.apu.in_power) > 0);
@@ -60,7 +61,13 @@ reactor::reactor(double mass, reactor_option const &option,
 
 void reactor::active_action() {
   auto occupancy = option_.output_wire.occupancy();
-  auto power = option_.peak_output * ((occupancy > 0.9) ? 1.0 - ((occupancy - 0.9) / 0.1) * 0.999 : 1);
+
+  next_power_ += (next_power_ < option_.peak_output) ? option_.ignition_speed : -option_.ignition_speed;
+
+  if (next_power_ < 0.1 * option_.peak_output)
+    next_power_ = 0.1 * option_.peak_output;
+
+  auto power = next_power_ * ((occupancy > 0.9) ? 1.0 - ((occupancy - 0.9) / 0.1) * 0.999 : 1);
 
   auto required_fuel = power * option_.fuel_per_charge;
   auto fuel = option_.nuclear_fuel.pull(required_fuel);
@@ -79,9 +86,6 @@ void reactor::active_action() {
 
   auto apu_power = apu_->push(current_power_);
   auto pushed = option_.output_wire.push(current_power_ - apu_power);
-
-  if (next_power_ > option_.peak_output)
-    next_power_ = option_.peak_output;
 }
 
 reactor::~reactor() = default;

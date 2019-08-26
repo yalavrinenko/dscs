@@ -3,7 +3,7 @@
 //
 
 #include "engine.hpp"
-void iengine::action() {
+void engine::action() {
   if (align_angle() != 0)
     align_engine();
 
@@ -32,7 +32,7 @@ void iengine::action() {
   }
 }
 
-void iengine::log_action() const {
+void engine::log_action() const {
   logger()->log("Engine [", name(),"]:");
   logger()->log("\tState:", (current_state_ == engine_state::active) ? "Active" : "Disable");
   logger()->log("\tFuel consumption:", current_fuel_comsumption_);
@@ -43,13 +43,13 @@ void iengine::log_action() const {
   current_fuel_comsumption_ = current_power_consumption_ = 0;
 }
 
-double iengine::mass() const { return icomponent::mass(); }
+double engine::mass() const { return icomponent::mass(); }
 
-iengine::iengine(double mass, engine_option const &option,
+engine::engine(double mass, engine_option const &option,
                  std::string const &name, plogger logger)
     : icomponent(mass, "Engine " + name, std::move(logger)), option_(option) {}
 
-void iengine::align_engine() {
+void engine::align_engine() {
   vector_2d delta {option_.thrust_align_speed, option_.thrust_align_speed};
   auto sign = [](auto v){
     return (v < 0) ? -1: 1;

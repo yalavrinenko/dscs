@@ -6,10 +6,13 @@
 #define DSCS_VOID_OBJECT_HPP
 #include "common.hpp"
 #include <memory>
+#include "logger_factory.hpp"
+#include "ships/component.hpp"
 
-class void_object {
+class void_object:  public icomponent{
 public:
-  explicit void_object(double mass): mass_(mass){
+  explicit void_object(double mass, std::string name, plogger logger):
+    icomponent(mass, std::move(name), std::move(logger)){
   }
 
   virtual void update(timestamp const &time) = 0;
@@ -17,10 +20,6 @@ public:
   virtual vector_2d force(timestamp const &time) = 0;
 
   virtual ~void_object() = default;
-
-  virtual double mass() const { return mass_; }
-protected:
-  double mass_;
 };
 
 using pvoid_object = std::unique_ptr<void_object>;

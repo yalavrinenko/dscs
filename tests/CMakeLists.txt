@@ -42,3 +42,6 @@ target_link_libraries(reactor libgtest libgmock pthread stdc++fs logger dscs-lib
 
 add_executable(engine engine.cpp)
 target_link_libraries(engine libgtest libgmock pthread stdc++fs logger dscs-lib)
+
+add_executable(ship ship.cpp)
+target_link_libraries(ship libgtest libgmock pthread stdc++fs logger dscs-lib)

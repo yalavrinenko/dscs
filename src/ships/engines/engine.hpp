@@ -30,9 +30,9 @@ enum class engine_state{
   disable
 };
 
-class iengine: public icomponent{
+class engine : public icomponent{
 public:
-  iengine(double mass, engine_option const &option, std::string const &name, plogger logger);
+  engine(double mass, engine_option const &option, std::string const &name, plogger logger);
 
   void action() override;
 
@@ -80,10 +80,5 @@ protected:
 private:
 };
 
-class small_engine: public iengine{
-public:
-  small_engine(engine_option const &option, std::string const &name, plogger logger):
-    iengine(10000.0, option, name, std::move(logger)){
-  }
-};
+
 #endif // DSCS_ENGINE_HPP
