@@ -15,12 +15,21 @@ public:
   small(std::string name, plogger logger);
 
 protected:
-  std::shared_ptr<reactor> master_core_, slave_core_;
+  struct {
+    std::shared_ptr<reactor> master_core_, slave_core_;
+    pfuel_tank_line reactor_fuel_;
+    pbattery_line main_battery_;
+  } power_system_;
 
-  std::shared_ptr<engine> main_engine_;
-  std::shared_ptr<engine> slave_engine_[2];
+  virtual void construct_power_system();
 
+  struct {
+    std::shared_ptr<engine> main_engine_, slave_engine_[2];
+    pfuel_tank_line main_fuel_;
+    pfuel_tank_line slave_fuel_lines_[2];
+  } engine_system_;
 
+  virtual void construct_engine_system();
 };
 
 #endif // DSCS_SMALL_HPP

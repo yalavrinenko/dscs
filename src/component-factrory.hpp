@@ -37,7 +37,7 @@ public:
       std::string name,
       plogger logger){
     auto scale = component_scale(size);
-    return std::make_shared<ComponentType>(ComponentType::defaul_mass() * scale,
+    return std::make_shared<ComponentType>(ComponentType::default_mass() * scale,
                                            ComponentOptionType::make_default(scale, out_wire, pipe),
                                            std::move(name), std::move(logger));
   }
