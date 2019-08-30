@@ -43,10 +43,13 @@ public:
     this->logger()->log(this->name() + ":");
     this->logger()->log("\t(left/total/consumption)", "(", fuel_mass_, "/", MAX_CAPACITY_, "/", consumption_, ")");
     this->logger()->log("\tMass:", this->mass());
-    consumption_ = 0.0;
   }
 
-  double consumption() const { return consumption_; }
+  double consumption() const {
+    auto consumption_value = consumption_;
+    consumption_ = 0.0;
+    return consumption_value;
+  }
 
   double capacity() const { return fuel_mass_;  }
 

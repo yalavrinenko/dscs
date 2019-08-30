@@ -9,6 +9,7 @@
 #include <vector>
 #include "void_object.hpp"
 #include "void_display.hpp"
+#include "ships/control/actions.hpp"
 
 class void_map {
 public:
@@ -43,7 +44,9 @@ protected:
   };
 
   std::vector<void_object_description> objects;
+  action_queue actions_;
   timestamp time;
+
   mutable std::unique_ptr<void_display> display;
 
   bool exit_ = false;

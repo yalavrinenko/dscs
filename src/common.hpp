@@ -9,39 +9,59 @@
 #include <fstream>
 #include <cmath>
 using namespace std::chrono_literals;
-
 struct timestamp{
 public:
   timestamp(): old_point_(std::chrono::high_resolution_clock::now()){
   }
 
-  double now() const {
+  explicit timestamp(size_t step): step_(step), time_(step * delta_()),
+    old_point_(std::chrono::high_resolution_clock::now()){
+  }
+
+  [[nodiscard]] double now() const {
     return time_;
   }
 
-  double delta() const {
-    return delta_;
+  [[nodiscard]] double delta() const {
+    return delta_();
+  }
+
+  [[nodiscard]] size_t step() const {
+    return step_;
   }
 
   timestamp& operator++ (){
-    time_ += delta_;
+    time_ += delta_();
+    ++step_;
     delay_system();
     return *this;
   }
 
+  timestamp operator+ (int v) const{
+    timestamp new_ts(*this);
+    new_ts.time_ += delta_() * v;
+    new_ts.step_ += v;
+    return new_ts;
+  }
+
+  bool operator < (timestamp const &ts) const { return this->step() < ts.step();  }
+
+  bool operator == (timestamp const &ts) const { return this->step() == ts.step(); }
 protected:
 
   void delay_system(){
     auto now_point = std::chrono::high_resolution_clock::now();
-    if (now_point - old_point_ < real_time_delta)
-      std::this_thread::sleep_for(real_time_delta - (now_point - old_point_));
+    if (now_point - old_point_ < real_time_delta())
+      std::this_thread::sleep_for(real_time_delta() - (now_point - old_point_));
     old_point_ = now_point;
   }
 
   double time_{0.0};
-  double const delta_ = 0.0010;
+  size_t step_ {0};
   std::chrono::high_resolution_clock::time_point old_point_;
-  std::chrono::milliseconds const real_time_delta{200ms}; //20ms
+
+  static std::chrono::milliseconds real_time_delta() {return 200ms; };
+  static double delta_() { return 0.0010; };
 };
 
 struct vector_2d{

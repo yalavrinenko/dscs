@@ -16,6 +16,7 @@ void void_map::update() {
 
   dump();
 }
+
 void void_map::integrate() {
   for (auto &o : objects){
     auto acceleration = o.object->force(time) / o.object->mass();
@@ -23,16 +24,19 @@ void void_map::integrate() {
     o.position += o.velocity * time.delta();
   }
 }
+
 void void_map::dump() const{
   for (auto const &o: objects){
     display->dump_object(o.position, o.velocity, time);
   }
 }
+
 void void_map::run() {
   while (!exit_){
     update();
   }
 }
+
 void void_map::update_objects() {
   for (auto &o : objects){
     o.object->update(time);

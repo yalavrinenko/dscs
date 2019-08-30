@@ -35,8 +35,8 @@ void small::construct_power_system() {
   power_system_.master_core_ = ReactorFactory::construct<ComponentSize::small>(reactor_pipe, reactor_out_wire, "Master PU", logger());
   power_system_.slave_core_ = ReactorFactory::construct<ComponentSize::tiny>(reactor_pipe, reactor_out_wire, "Slave PU", logger());
 
-  add_component(power_system_.master_core_);
-  add_component(power_system_.slave_core_);
+  add_component(power_system_.master_core_, true);
+  add_component(power_system_.slave_core_, true);
   add_component(power_system_.reactor_fuel_);
   add_component(power_system_.main_battery_);
 }
@@ -62,14 +62,14 @@ void small::construct_engine_system() {
   fuel_pipe main_pipe(engine_system_.main_fuel_, power_system_.main_battery_, 0.1);
   engine_system_.main_engine_ = EngineFactory::construct<ComponentSize::small>(main_pipe, power_supply, "Master Engine", logger());
 
-  add_component(engine_system_.main_engine_);
+  add_component(engine_system_.main_engine_, true);
   add_component(engine_system_.main_fuel_);
 
   for (auto i = 0; i < 2; ++i){
     fuel_pipe slave_pipe(engine_system_.slave_fuel_lines_[i], power_system_.main_battery_, 0.1);
     engine_system_.slave_engine_[i] = EngineFactory::construct<ComponentSize::tiny>(slave_pipe, power_supply, "Slave Engine " + std::to_string((i)), logger());
 
-    add_component(engine_system_.slave_engine_[i]);
+    add_component(engine_system_.slave_engine_[i], true);
     add_component(engine_system_.slave_fuel_lines_[i]);
   }
 }

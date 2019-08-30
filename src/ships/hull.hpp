@@ -7,6 +7,8 @@
 #include "../void_object.hpp"
 #include <numeric>
 #include <algorithm>
+#include "control/icontrol.hpp"
+
 class ship_hull: public void_object{
 public:
   ship_hull(double hull_mass, std::string name, plogger logger):
@@ -33,12 +35,33 @@ public:
     action();
   }
 
+  void add_control_unit(std::unique_ptr<icontrol> unit) {
+    control_unit_ = std::move(unit);
+  }
+
+  std::vector<control_action> extract_control_actions(timestamp const &ts){
+    auto events = control_unit_->control(ts);
+    std::vector<control_action> actions;
+    std::transform(events.begin(), events.end(), std::back_inserter(actions), [this, &ts](auto const& e){
+      return e->action(this->command_interface_, ts);
+    });
+    return actions;
+  }
+
   ~ship_hull() override = default;
 
 protected:
-  void add_component(pscomponent component) {
+  void add_component(pscomponent component, bool is_interface=false) {
     hull_components_.emplace_back(std::move(component));
+    if (is_interface){
+      command_interface_.register_interface(hull_components_.back()->name(),
+                                            hull_components_.back());
+    }
   }
+
+  control_interface command_interface_;
+
+  std::unique_ptr<icontrol> control_unit_;
 
   std::vector<pscomponent> hull_components_;
 };

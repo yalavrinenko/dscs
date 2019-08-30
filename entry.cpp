@@ -44,10 +44,12 @@ int main(int argc,char** argv){
     auto hulk = std::make_unique<drifting_hulk>(r.uniform(1000, 10000));
     space.add_object(std::move(hulk), r.uniform_v(-1000, 1000), r.uniform_v(-0.1, 0.1));
   }
+
   std::thread t([&space](){
     std::this_thread::sleep_for(20s);
     space.stop();
   });
+
   space.run();
   t.join();
 
