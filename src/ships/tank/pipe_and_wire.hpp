@@ -23,10 +23,16 @@ public:
     return linked_line_->push(evaluate_q(q));
   }
 
+  [[nodiscard]] std::shared_ptr<adapter_type> linked_line() const { return linked_line_; }
+
   pbattery_line electric_line() { return electric_supply_line_;  }
 
   void set_electric_line(pbattery_line const &new_line){
     electric_supply_line_ = new_line;
+  }
+
+  [[nodiscard]] virtual double occupancy() const {
+    return linked_line_->capacity() / linked_line_->max_capacity();
   }
 
 protected:
@@ -40,10 +46,15 @@ protected:
   }
 
   std::shared_ptr<adapter_type> linked_line_;
-
 private:
   double charge_consumption_;
   pbattery_line electric_supply_line_;
+};
+
+class wire : public ipipe<battery_line>{
+public:
+  explicit wire(pbattery_line linked_line): ipipe(std::move(linked_line), nullptr, 0.0){
+  }
 };
 
 class fuel_pipe : public ipipe<fuel_tank_line>{
@@ -52,15 +63,8 @@ public:
             pbattery_line electric_supply, double charge_consumption)
       : ipipe(std::move(linked_line), std::move(electric_supply),
               charge_consumption) {}
-};
 
-class wire : public ipipe<battery_line>{
-public:
-  explicit wire(pbattery_line linked_line): ipipe(std::move(linked_line), nullptr, 0.0){
-  }
-
-  double occupancy() const {
-    return linked_line_->capacity() / linked_line_->max_capacity();
-  }
+  fuel_pipe(pfuel_tank_line linked_line, wire const &electric_supply, double charge_consumption):
+    ipipe(std::move(linked_line), electric_supply.linked_line(), charge_consumption){}
 };
 #endif // DSCS_PIPE_AND_WIRE_HPP

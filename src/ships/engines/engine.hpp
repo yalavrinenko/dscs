@@ -69,7 +69,13 @@ public:
 
   vector_2d const& thrust_direction() const { return current_thrust_direction_; }
 
-  double thrust() const {return current_thrust_; }
+  double thrust_level() const { return current_thrust_; }
+
+  vector_2d thrust() const {
+    auto norm = current_thrust_direction_;
+    norm.norm();
+    return norm * current_thrust_;
+  }
 
   static constexpr double default_mass(){ return 10.0;  }
 protected:

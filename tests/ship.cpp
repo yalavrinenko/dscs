@@ -2,15 +2,24 @@
 // Created by yalavrinenko on 24.08.2019.
 //
 
-#include "../src/ships/tank/battery_adapter.hpp"
-#include "../src/ships/tank/fuel_adapter.hpp"
-#include "../src/ships/tank/pipe_and_wire.hpp"
-#include "../src/ships/power/reactor.hpp"
-#include "../src/ships/engines/engine.hpp"
+#include "../src/ships/small.hpp"
 #include <gtest/gtest.h>
 #include <random>
 #include <thread>
 
+TEST(ship, exist){
+  logger_factory factory("../../ramfs");
+
+  small small_ship("Ship S1", factory.create_logger("S1", 1024*10));
+
+  timestamp ts;
+  for (auto i = 0; i < 10000; ++i){
+    ++ts;
+    small_ship.update(ts);
+    small_ship.log_action();
+    factory.flush_loggers();
+  }
+}
 
 int main(int argc, char** argv){
   testing::InitGoogleTest(&argc, argv);

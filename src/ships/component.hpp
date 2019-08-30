@@ -21,13 +21,13 @@ public:
     return mass_;
   }
 
-  plogger& logger() const {
-    return logger_;
-  }
-
   auto const& name() const {return name_;};
 protected:
   double mass_{};
+
+  plogger& logger() const {
+    return logger_;
+  }
 
 private:
   mutable plogger logger_ = nullptr;

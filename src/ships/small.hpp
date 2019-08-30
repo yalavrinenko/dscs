@@ -13,6 +13,7 @@
 class small : public ship_hull{
 public:
   small(std::string name, plogger logger);
+  vector_2d force(timestamp const &time) override;
 
 protected:
   struct {

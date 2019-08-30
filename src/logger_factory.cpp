@@ -6,8 +6,8 @@
 using namespace std::string_literals;
 
 std::shared_ptr<logger_entry>
-logger_factory::create_logger(std::string const &name) {
-  loggers.emplace_back(std::make_unique<entry_info>(ramfs_path / name));
+logger_factory::create_logger(std::string const &name, size_t size) {
+  loggers.emplace_back(std::make_unique<entry_info>(ramfs_path / name, size));
   return loggers.back()->user_entry;
 }
 

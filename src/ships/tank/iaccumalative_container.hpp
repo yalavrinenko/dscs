@@ -46,6 +46,8 @@ public:
     consumption_ = 0.0;
   }
 
+  double consumption() const { return consumption_; }
+
   double capacity() const { return fuel_mass_;  }
 
   double max_capacity() const { return MAX_CAPACITY_; }

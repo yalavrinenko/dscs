@@ -37,7 +37,7 @@ void engine::log_action() const {
   logger()->log("\tState:", (current_state_ == engine_state::active) ? "Active" : "Disable");
   logger()->log("\tFuel consumption:", current_fuel_comsumption_);
   logger()->log("\tPower consumption:", current_power_consumption_);
-  logger()->log("\tCurrent thrust:", current_thrust_);
+  logger()->log("\tCurrent thrust_level:", current_thrust_);
   logger()->log("\tAlign angle:", align_angle());
   logger()->log("\tThrust direction (x, y):", current_thrust_direction_.x,";", current_thrust_direction_.y);
   current_fuel_comsumption_ = current_power_consumption_ = 0;

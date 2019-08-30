@@ -70,9 +70,19 @@ public:
 
   void log_action() const override{
     this->logger()->log("Adapter [", this->name() + "]:");
-    for (auto const& container: inputs)
-      container->log_action();
-    this->logger()->log("Mass:", this->mass());
+    struct {
+      double current{0};
+      double max{0};
+      double consumption{0};
+    } info{};
+    std::for_each(inputs.begin(), inputs.end(), [&info](auto const &v){
+      info.current += v->capacity();
+      info.max += v->max_capacity();
+      info.consumption += v->consumption();
+    });
+
+    this->logger()->log("\t(left/total/consumption)", "(", info.current, "/", info.max, "/", info.consumption, ")");
+    this->logger()->log("\tMass:", this->mass());
   }
 
   template <class ... TArgs>

@@ -33,8 +33,8 @@ protected:
 
   void delay_system(){
     auto now_point = std::chrono::high_resolution_clock::now();
-    if (now_point - old_point_ > real_time_delta)
-      std::this_thread::sleep_for(now_point - (old_point_ + real_time_delta));
+    if (now_point - old_point_ < real_time_delta)
+      std::this_thread::sleep_for(real_time_delta - (now_point - old_point_));
     old_point_ = now_point;
   }
 

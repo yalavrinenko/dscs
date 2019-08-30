@@ -28,7 +28,7 @@ class logger_factory {
 public:
   explicit logger_factory(std::filesystem::path const &ramfs_path): ramfs_path(ramfs_path){};
 
-  std::shared_ptr<logger_entry> create_logger(std::string const &name);
+  std::shared_ptr<logger_entry> create_logger(std::string const &name, size_t size=1024*10);
 
   void flush_loggers();
 

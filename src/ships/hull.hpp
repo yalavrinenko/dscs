@@ -33,8 +33,6 @@ public:
     action();
   }
 
-  vector_2d force(timestamp const &time) override { return vector_2d(); }
-
   ~ship_hull() override = default;
 
 protected:
