@@ -8,61 +8,43 @@
 #include "ships/engines/engine.hpp"
 #include "ships/power/reactor.hpp"
 
-class ReactorFactory{
+class UnknownComponentSize: public std::exception{
 public:
+  explicit UnknownComponentSize(std::string text):  message(std::move(text)){}
 
+  [[nodiscard]]
+  const char *what() const noexcept override { return message.c_str(); }
 private:
-  static reactor_option base_option(fuel_pipe const &fuel,
+  std::string message;
+};
+
+enum class ComponentSize{
+  tiny,
+  small,
+  normal,
+  big,
+  huge
+};
+
+double component_scale(ComponentSize size);
+
+template <class ComponentType, class ComponentOptionType>
+class ComponentFactory{
+public:
+  template <ComponentSize size=ComponentSize::normal>
+  static std::shared_ptr<ComponentType> construct(fuel_pipe const &pipe,
       wire const &out_wire,
-      double scale = 1) {
-    return {
-        {
-            1.0 * scale,
-            500.0 * 2 * scale,
-            1.0 * scale,
-            5.0 * scale
-        },
-        fuel,
-        out_wire,
-        10.0 * scale,
-        0.01 * scale,
-        0.2 * scale,
-        0.1 * scale
-    };
+      std::string name,
+      plogger logger){
+    auto scale = component_scale(size);
+    return std::make_shared<ComponentType>(ComponentType::defaul_mass() * scale,
+                                           ComponentOptionType::make_default(scale, out_wire, pipe),
+                                           std::move(name), std::move(logger));
   }
-
-  static std::shared_ptr<reactor> construct(fuel_pipe const &fuel, wire const &out_wire,
-                                            std::string name,
-                                            double scale=1,
-                                            plogger logger = nullptr);
 };
 
+using ReactorFactory = ComponentFactory<reactor, reactor_option>;
+using EngineFactory = ComponentFactory<engine, engine_option>;
 
-class EngineFactory{
-public:
-
-private:
-  static engine_option base_option(fuel_pipe const &fuel,
-                                    wire const &out_wire,
-                                    double scale = 1) {
-    return {
-      100.0 * scale,
-      5.0 * scale,
-      {
-        out_wire,
-        fuel
-      },
-      1.0 * scale,
-      2.0 * scale,
-      0.01 / scale,
-      0.5 * scale
-    };
-  }
-
-  static std::shared_ptr<engine> construct(fuel_pipe const &fuel, wire const &out_wire,
-                                            std::string name,
-                                            double scale=1,
-                                            plogger logger = nullptr);
-};
 
 #endif // DSCS_COMPONENT_FACTRORY_HPP

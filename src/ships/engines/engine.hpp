@@ -23,6 +23,12 @@ struct engine_option{
 
   double thrust_align_speed;
   double align_charge;
+
+  static engine_option make_default(double scale, wire const &out_wire,
+                                    fuel_pipe const &fuel) {
+    return {100.0 * scale, 5.0 * scale,  {out_wire, fuel}, 1.0 * scale,
+            2.0 * scale,   0.01 / scale, 0.5 * scale};
+  }
 };
 
 enum class engine_state{
@@ -64,6 +70,8 @@ public:
   vector_2d const& thrust_direction() const { return current_thrust_direction_; }
 
   double thrust() const {return current_thrust_; }
+
+  static constexpr double default_mass(){ return 10.0;  }
 protected:
   virtual void align_engine();
 

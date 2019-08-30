@@ -28,6 +28,17 @@ struct reactor_option {
 
   double ignition_speed;
   double ignition_charge_consumption;
+
+  static reactor_option make_default(double scale, wire const &out_wire,
+                                     fuel_pipe const &fuel) {
+    return {{1.0 * scale, 500.0 * 2 * scale, 1.0 * scale, 5.0 * scale},
+            fuel,
+            out_wire,
+            10.0 * scale,
+            0.01 * scale,
+            0.2 * scale,
+            0.1 * scale};
+  }
 };
 
 enum class reactor_state{
@@ -83,6 +94,8 @@ public:
   reactor_state state() const { return state_; }
 
   virtual ~reactor();
+
+  static constexpr double default_mass(){ return 20.0;  }
 protected:
   virtual void ignite_action();
 
