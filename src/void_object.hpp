@@ -8,6 +8,7 @@
 #include <memory>
 #include "logger_factory.hpp"
 #include "ships/component.hpp"
+#include "ships/control/actions.hpp"
 
 class void_object:  public icomponent{
 public:
@@ -18,6 +19,8 @@ public:
   virtual void update(timestamp const &time) = 0;
 
   virtual vector_2d force(timestamp const &time) = 0;
+
+  virtual std::vector<control_action> extract_control_actions(timestamp const &ts) = 0;
 
   virtual ~void_object() = default;
 };

@@ -44,7 +44,7 @@ void small::construct_engine_system() {
   auto make_fuel_line = [this](auto banks, auto volume, auto name){
     auto fuel_line = std::make_shared<fuel_tank_line>(1.0, 100, 100, std::move(name), logger());
     for (auto i = 0u; i < banks; ++i)
-      fuel_line->add_tank(volume, 0.1, 1.0);
+      fuel_line->add_tank(volume, 0.1, 1);
     while (fuel_line->push(100.0) > 0);
     return fuel_line;
   };

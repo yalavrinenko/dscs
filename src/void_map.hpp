@@ -13,6 +13,11 @@
 
 class void_map {
 public:
+  explicit void_map(std::shared_ptr<logger_factory> log_factory):
+    logger_factory_(std::move(log_factory)){
+    display = std::make_unique<void_display>(logger_factory_->create_logger("void_display.map"));
+  }
+
   virtual void add_object(pvoid_object &&object, vector_2d const &position,
                           vector_2d const &velocity);
 
@@ -34,6 +39,8 @@ protected:
 
   void dump() const;
 
+  void update_actions(timestamp const &time);
+
   struct void_object_description{
     pvoid_object object;
     vector_2d position;
@@ -48,6 +55,7 @@ protected:
   timestamp time;
 
   mutable std::unique_ptr<void_display> display;
+  std::shared_ptr<logger_factory> logger_factory_;
 
   bool exit_ = false;
 };

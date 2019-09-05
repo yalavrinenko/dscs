@@ -10,11 +10,17 @@ void void_map::add_object(pvoid_object &&object, vector_2d const &position,
 void void_map::update() {
   ++time;
 
+  while (actions_.invoke_next(time));
+
   update_objects();
 
   integrate();
 
   dump();
+
+  update_actions(time);
+
+  logger_factory_->flush_loggers();
 }
 
 void void_map::integrate() {
@@ -27,7 +33,8 @@ void void_map::integrate() {
 
 void void_map::dump() const{
   for (auto const &o: objects){
-    display->dump_object(o.position, o.velocity, time);
+    o.object->log_action();
+    display->dump_object(o.position, o.velocity, time, o.object->name());
   }
 }
 
@@ -40,5 +47,10 @@ void void_map::run() {
 void void_map::update_objects() {
   for (auto &o : objects){
     o.object->update(time);
+  }
+}
+void void_map::update_actions(timestamp const &time) {
+  for (auto &o : objects) {
+    actions_.push_actions(o.object->extract_control_actions(time));
   }
 }

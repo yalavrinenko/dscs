@@ -8,22 +8,23 @@
 #include "common.hpp"
 #include <fstream>
 #include <vector>
-#include <filesystem>
+#include "logger_factory.hpp"
 
 std::ofstream& operator << (std::ofstream& out, vector_2d const &v);
 
 class void_display: public idisplay{
 public:
-  explicit void_display(std::filesystem::path const& path): output(path){
+  explicit void_display(plogger logger): logger_(std::move(logger)){
   }
 
-  void dump_object(vector_2d const& p, vector_2d const &v, timestamp const &t);
+  void dump_object(vector_2d const &p, vector_2d const &v, timestamp const &t,
+                   std::string const &name);
 
-  ~void_display() override {
-    output.close();
-  }
+  plogger & logger() { return logger_; }
+
+  ~void_display() override = default;
 private:
-  std::ofstream output;
+  plogger logger_;
 };
 
 #endif // DSCS_VOID_DISPLAY_HPP

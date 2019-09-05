@@ -11,9 +11,10 @@
 
 class control_interface{
 public:
-  pscomponent find_interface(std::string const &name) const{
+  template<class ComponentType>
+  std::shared_ptr<ComponentType> find_interface(std::string const &name) const{
     if (interface_map_.count(name))
-      return interface_map_.at(name);
+      return std::dynamic_pointer_cast<ComponentType>(interface_map_.at(name));
     else
       return nullptr;
   }
@@ -31,6 +32,9 @@ public:
   virtual control_action action(control_interface &interface, timestamp const &ts) = 0;
 
   virtual ~control_event() = default;
+
+protected:
+  auto default_action(timestamp const &ts) { return control_action([](auto const &ts){}, ts + 1); };
 };
 
 using pcontrol_event = std::unique_ptr<control_event>;

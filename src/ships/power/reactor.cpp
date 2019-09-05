@@ -45,8 +45,11 @@ void reactor::log_action() const  {
   logger()->log("\tOutput power:", current_power_);
   logger()->log("\tFuel consumption:", fuel_consumtion_);
   logger()->log("\tElectric consumption:", charge_consumption_);
+
+  logger()->up_level();
   for (auto &component: components_)
     component->log_action();
+  logger()->down_level();
 }
 
 reactor::reactor(double mass, reactor_option const &option,

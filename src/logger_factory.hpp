@@ -58,17 +58,23 @@ public:
 
   template <class TArg>
   void log(TArg const &arg){
-    log_impl(arg, "\n");
+    std::string shift(log_level_, '\t');
+    log_impl(shift, arg, "\n");
   }
 
   template <class TArg, class ... TArgs>
   void log(TArg const &arg1, TArgs ... args){
-    log_impl(arg1, args..., "\n");
+    std::string shift(log_level_, '\t');
+    log_impl(shift, arg1, args..., "\n");
   }
 
   auto const& linked_path() const {
     return linked_path_;
   }
+
+  void up_level() { log_level_ += 1; }
+
+  void down_level() { if (log_level_ != 0) log_level_ -= 1; }
 
   ~logger_entry(){
     std::filesystem::remove(linked_path());
@@ -95,6 +101,8 @@ protected:
   std::ostringstream buffer;
 
   std::filesystem::path const linked_path_;
+
+  size_t log_level_{0};
 
   friend logger_factory;
 };

@@ -34,9 +34,9 @@ struct reactor_option {
     return {{1.0 * scale, 500.0 * 2 * scale, 1.0 * scale, 5.0 * scale},
             fuel,
             out_wire,
-            10.0 * scale,
+            20.0 * scale,
             0.01 * scale,
-            0.2 * scale,
+            0.1 * scale,
             0.1 * scale};
   }
 };

@@ -9,7 +9,7 @@ def print_file(filepath):
         print(content)
 
 while (1):
-    file_list = glob.glob("../ramfs/*")
+    file_list = glob.glob("../ramfs/*.ship")
     for file in file_list:
         print_file(file)
 

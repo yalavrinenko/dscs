@@ -22,8 +22,11 @@ public:
   void log_action() const override {
     logger()->log("Ship ", name());
     logger()->log("Mass:", mass());
+
+    logger()->up_level();
     for (auto &c : hull_components_)
       c->log_action();
+    logger()->down_level();
   }
 
   double mass() const override { return icomponent::mass() +
@@ -39,7 +42,7 @@ public:
     control_unit_ = std::move(unit);
   }
 
-  std::vector<control_action> extract_control_actions(timestamp const &ts){
+  std::vector<control_action> extract_control_actions(timestamp const &ts) override{
     auto events = control_unit_->control(ts);
     std::vector<control_action> actions;
     std::transform(events.begin(), events.end(), std::back_inserter(actions), [this, &ts](auto const& e){
