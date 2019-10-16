@@ -54,3 +54,9 @@ void void_map::update_actions(timestamp const &time) {
     actions_.push_actions(o.object->extract_control_actions(time));
   }
 }
+const void_map::void_object_description &
+void_map::find_object(void_object const *ptr) const {
+  return *std::find_if(objects.begin(), objects.end(), [ptr](void_object_description const &obj){
+    return obj.object.get() == ptr;
+  });
+}

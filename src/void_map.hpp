@@ -10,11 +10,13 @@
 #include "void_object.hpp"
 #include "void_display.hpp"
 #include "ships/control/actions.hpp"
+#include "signal_env.hpp"
 
-class void_map {
+class void_map: std::enable_shared_from_this<void_map> {
 public:
   explicit void_map(std::shared_ptr<logger_factory> log_factory):
-    logger_factory_(std::move(log_factory)){
+    logger_factory_(std::move(log_factory)),
+    sig_env_(shared_from_this()){
     display = std::make_unique<void_display>(logger_factory_->create_logger("void_display.map"));
   }
 
@@ -32,6 +34,7 @@ public:
   void stop() {
     exit_ = true;
   }
+
 protected:
   void update_objects();
 
@@ -50,14 +53,20 @@ protected:
     }
   };
 
+  void_object_description const& find_object(void_object const* ptr) const;
+
   std::vector<void_object_description> objects;
   action_queue actions_;
   timestamp time;
+
+  signal_environment sig_env_;
 
   mutable std::unique_ptr<void_display> display;
   std::shared_ptr<logger_factory> logger_factory_;
 
   bool exit_ = false;
+
+  friend signal_environment;
 };
 
 #endif // DSCS_VOID_MAP_HPP

@@ -73,7 +73,7 @@ struct vector_2d{
     return {this->x + v.x, this->y + v.y};
   }
 
-  vector_2d operator- (vector_2d const &v){
+  vector_2d operator- (vector_2d const &v) const{
     return {this->x - v.x, this->y - v.y};
   }
 
@@ -100,8 +100,13 @@ struct vector_2d{
     y /= l;
   }
 
-  double len(){
+  double len() const{
     return std::sqrt(x*x + y*y);
+  }
+
+  [[nodiscard]] vector_2d in_polar() const {
+    auto norm_this = *this; norm_this.norm();
+    return {this->len(), std::atan2(norm_this.y, norm_this.x)};
   }
 
   double x{0}, y{0};

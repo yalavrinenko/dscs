@@ -56,16 +56,12 @@ class logger_entry{
 public:
   explicit logger_entry(std::filesystem::path path): linked_path_(std::move(path)){}
 
-  template <class TArg>
-  void log(TArg const &arg){
+  template <class ... TArgs>
+  void log(TArgs ... args){
     std::string shift(log_level_, '\t');
-    log_impl(shift, arg, "\n");
-  }
-
-  template <class TArg, class ... TArgs>
-  void log(TArg const &arg1, TArgs ... args){
-    std::string shift(log_level_, '\t');
-    log_impl(shift, arg1, args..., "\n");
+    log_impl(shift);
+    (log_impl(args), ...);
+    log_impl("\n");
   }
 
   auto const& linked_path() const {
@@ -83,12 +79,6 @@ protected:
   template <class TArg>
   void log_impl(TArg const &arg){
     buffer << arg << " ";
-  }
-
-  template <class TArg, class ... TArgs>
-  void log_impl(TArg const &arg1, TArgs ... args){
-    log_impl(arg1);
-    log_impl(args...);
   }
 
   void clear(){
