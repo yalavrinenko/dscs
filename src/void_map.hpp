@@ -66,7 +66,7 @@ protected:
 
   bool exit_ = false;
 
-  friend signal_environment;
+  friend void_environment;
 };
 
 #endif // DSCS_VOID_MAP_HPP

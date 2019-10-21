@@ -34,27 +34,6 @@ public:
   std::vector<control_action> extract_control_actions(timestamp const &ts);
 
 protected:
-  struct comm_signal{
-
-    comm_signal(comm_data data, vector_2d location): data(std::move(data)),
-      location_(location){
-    }
-
-    enum class type{
-      original,
-      reflected
-    };
-    comm_data data;
-    type direction{type::original};
-
-    [[nodiscard]]
-    vector_2d source_location(vector_2d const &reciver_location) const;
-
-    [[nodiscard]]
-    comm_signal reflect_from(vector_2d const &location) const;
-  private:
-    vector_2d const location_;
-  };
 
   std::shared_ptr<void_map> void_map_;
   std::queue<comm_signal> signals_;
