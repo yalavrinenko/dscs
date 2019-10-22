@@ -9,6 +9,14 @@ small::small(std::string name, plogger logger):
 
   construct_power_system();
   construct_engine_system();
+
+  wire radar_wire(power_system_.main_battery_);
+  radio_transmitter_option r_option{radar_wire};
+  radar_ = std::make_unique<radar>(
+      1.0, 5, r_option, this->env_.EM_Field(), "Main Radar",
+      this->logger()->factory()->create_logger(this->name() + ".radar"s));
+
+  add_component(radar_, true);
 }
 
 void small::construct_power_system() {

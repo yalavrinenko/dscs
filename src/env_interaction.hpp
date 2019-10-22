@@ -6,14 +6,14 @@
 #define DSCS_ENV_INTERACTION_HPP
 
 #include <memory>
-#include "void_map.hpp"
-#include "ships/detection/communications.hpp"
+#include "fields/em_field.hpp"
 
 class void_environment{
 public:
+  [[nodiscard]] em_field & EM_Field() { return em_field_; }
 
 protected:
-
+  em_field em_field_;
 };
 
 using pvoid_environment = std::shared_ptr<void_environment>;

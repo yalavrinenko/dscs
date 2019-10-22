@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+project(dscs)
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(SRC src/void_map.cpp src/void_map.hpp
@@ -20,7 +22,15 @@ set(SRC src/void_map.cpp src/void_map.hpp
         src/ships/tank/icontainer_adapter.hpp
         src/ships/tank/pipe_and_wire.cpp
         src/ships/tank/pipe_and_wire.hpp
-        src/ships/power/reactor.cpp src/ships/engines/engine.cpp src/ships/engines/engine.hpp src/component-factrory.cpp src/component-factrory.hpp src/ships/control/actions.cpp src/ships/control/actions.hpp src/ships/control/icontrol.hpp src/ships/control/control_events/base_events.cpp src/ships/control/control_events/base_events.hpp src/ships/control/control_units/time_controller.cpp src/ships/control/control_units/time_controller.hpp src/ships/detection/communications.cpp src/ships/detection/communications.hpp src/signal_env.cpp src/signal_env.hpp src/env_interaction.cpp src/env_interaction.hpp src/fields/ifield.hpp)
+        src/ships/power/reactor.cpp
+        src/ships/engines/engine.cpp src/ships/engines/engine.hpp
+        src/component-factrory.cpp src/component-factrory.hpp
+        src/ships/control/actions.cpp src/ships/control/actions.hpp
+        src/ships/control/icontrol.hpp src/ships/control/control_events/base_events.cpp
+        src/ships/control/control_events/base_events.hpp
+        src/ships/control/control_units/time_controller.cpp src/ships/control/control_units/time_controller.hpp
+        src/ships/detection/communications.cpp src/ships/detection/communications.hpp
+        src/env_interaction.cpp src/env_interaction.hpp src/fields/em_field.hpp src/fields/em_field.cpp src/ships/detection/radar.cpp src/ships/detection/radar.hpp)
 
 add_library(logger src/logger_factory.cpp src/logger_factory.hpp)
 target_link_libraries(logger stdc++fs)

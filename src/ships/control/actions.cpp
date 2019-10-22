@@ -5,9 +5,8 @@
 #include "actions.hpp"
 bool action_queue::invoke_next(timestamp const &ts) {
   if (!queue_.empty() && queue_.top().step() == ts) {
-    auto top = queue_.top();
+    auto top = queue_.top(); queue_.pop();
     top.run(ts);
-    queue_.pop();
     return true;
   } else {
     return false;

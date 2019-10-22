@@ -9,6 +9,11 @@
 #include <fstream>
 #include <cmath>
 using namespace std::chrono_literals;
+
+struct PhysUnit {
+   inline static double EM_SPEED() { return 100.0; }
+};
+
 struct timestamp{
 public:
   timestamp(): old_point_(std::chrono::high_resolution_clock::now()){

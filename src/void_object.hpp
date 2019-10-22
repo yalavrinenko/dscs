@@ -23,12 +23,12 @@ public:
 
   virtual std::vector<control_action> extract_control_actions(timestamp const &ts) = 0;
 
-  [[nodiscard]] pvoid_environment & env_link() { return env_; }
+  [[nodiscard]] void_environment & env_link() { return env_; }
 
   virtual ~void_object() = default;
 
 protected:
-  pvoid_environment env_ = nullptr;
+  void_environment env_;
 };
 
 using pvoid_object = std::unique_ptr<void_object>;

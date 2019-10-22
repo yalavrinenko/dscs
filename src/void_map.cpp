@@ -10,17 +10,19 @@ void void_map::add_object(pvoid_object &&object, vector_2d const &position,
 void void_map::update() {
   ++time;
 
-  while (actions_.invoke_next(time));
-
   update_objects();
 
   integrate();
 
   dump();
 
+  propagate_signals(time);
+
   update_actions(time);
 
   logger_factory_->flush_loggers();
+
+  while (actions_.invoke_next(time));
 }
 
 void void_map::integrate() {
@@ -49,14 +51,56 @@ void void_map::update_objects() {
     o.object->update(time);
   }
 }
-void void_map::update_actions(timestamp const &time) {
+
+void void_map::update_actions(timestamp const &ts) {
   for (auto &o : objects) {
-    actions_.push_actions(o.object->extract_control_actions(time));
+    actions_.push_actions(o.object->extract_control_actions(ts));
   }
 }
-const void_map::void_object_description &
-void_map::find_object(void_object const *ptr) const {
+
+const void_map::void_object_description & void_map::find_object(void_object const *ptr) const {
   return *std::find_if(objects.begin(), objects.end(), [ptr](void_object_description const &obj){
     return obj.object.get() == ptr;
   });
+}
+
+void void_map::propagate_signals(timestamp const &ts) {
+  for (auto &object : objects){
+    auto &message_queue = object.object->env_link().EM_Field().package_queue();
+    while (!message_queue.empty()){
+      auto comm_message = message_queue.front(); message_queue.pop();
+      auto comm_package = field_package(comm_message, comm_message.power());
+      this->actions_.push_actions(signal_propagate_action(comm_package, object.position, ts));
+    }
+  }
+}
+
+std::vector<control_action> void_map::signal_propagate_action(field_package comm_package,
+                                                 vector_2d sender_location, timestamp const &ts) {
+  std::vector<control_action> signal_transmission_action;
+  for (auto ts_shift = 0; ts_shift < std::ceil(comm_package.transmission_power()); ++ts_shift) {
+    auto next_ts = ts + ts_shift;
+    std::pair range{ts_shift * PhysUnit::EM_SPEED(), (ts_shift + 1) * PhysUnit::EM_SPEED()};
+
+    auto propagate_action = [sender_location, range,  comm_package,
+                             this](timestamp const &ts) mutable {
+      for (auto &object : objects) {
+        auto distance = (object.position - sender_location).len();
+        if (range.first < distance && distance <= range.second) {
+          comm_package.source_location() = (object.position - sender_location).in_polar();
+          object.object->env_link().EM_Field().recieve_packet(comm_package);
+
+          if (comm_package.package_type() == field_package::type::original) {
+            auto reflected_package = comm_package.reflect();
+            auto reflection_actions = this->signal_propagate_action(reflected_package, object.position, ts);
+            this->actions_.push_actions(reflection_actions);
+          }
+        }
+      }
+    };
+
+    signal_transmission_action.emplace_back(propagate_action, next_ts);
+  }
+
+  return signal_transmission_action;
 }

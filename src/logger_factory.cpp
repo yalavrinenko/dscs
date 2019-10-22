@@ -7,7 +7,7 @@ using namespace std::string_literals;
 
 std::shared_ptr<logger_entry>
 logger_factory::create_logger(std::string const &name, size_t size) {
-  loggers.emplace_back(std::make_unique<entry_info>(ramfs_path / name, size));
+  loggers.emplace_back(std::make_unique<entry_info>(ramfs_path / name, this, size));
   return loggers.back()->user_entry;
 }
 
@@ -16,8 +16,8 @@ void logger_factory::flush_loggers() {
     logger->flush();
 }
 
-logger_factory::entry_info::entry_info(std::string const &name, size_t size): memsize(size) {
-  user_entry = std::make_shared<logger_entry>(name);
+logger_factory::entry_info::entry_info(std::string const &name, logger_factory* factory, size_t size): memsize(size) {
+  user_entry = std::make_shared<logger_entry>(name, factory);
   file_descr = create_shared_file(name, memsize);
   memptr = static_cast<uint8_t *>(
       mmap(nullptr, memsize, PROT_READ | PROT_WRITE, MAP_SHARED, file_descr, 0)

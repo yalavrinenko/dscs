@@ -8,6 +8,7 @@
 #include "actions.hpp"
 #include <unordered_map>
 #include "../component.hpp"
+#include "../../env_interaction.hpp"
 
 class control_interface{
 public:

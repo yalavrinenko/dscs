@@ -34,7 +34,7 @@ public:
 
 protected:
   struct entry_info{
-    explicit entry_info(std::string const &name, size_t size = 1024 * 10);
+    explicit entry_info(std::string const &name, logger_factory* factory, size_t size = 1024 * 10);
 
     int create_shared_file(std::string const &name, size_t size);
 
@@ -54,7 +54,9 @@ protected:
 
 class logger_entry{
 public:
-  explicit logger_entry(std::filesystem::path path): linked_path_(std::move(path)){}
+  explicit logger_entry(std::filesystem::path path, logger_factory* factory):
+    factory_{factory},
+    linked_path_(std::move(path)){}
 
   template <class ... TArgs>
   void log(TArgs ... args){
@@ -72,9 +74,12 @@ public:
 
   void down_level() { if (log_level_ != 0) log_level_ -= 1; }
 
+  logger_factory* factory() { return factory_; }
+
   ~logger_entry(){
     std::filesystem::remove(linked_path());
   }
+
 protected:
   template <class TArg>
   void log_impl(TArg const &arg){
@@ -93,6 +98,8 @@ protected:
   std::filesystem::path const linked_path_;
 
   size_t log_level_{0};
+
+  logger_factory* factory_ = nullptr;
 
   friend logger_factory;
 };

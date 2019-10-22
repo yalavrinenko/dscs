@@ -30,6 +30,10 @@ public:
     return this->step() < a.step();
   }
 
+  bool operator> (control_action const &a) const {
+    return !(this->step() < a.step());
+  }
+
   void set_timestamp(timestamp const &ts){
     action_step = ts;
   }
@@ -51,8 +55,7 @@ public:
     return count;
   }
 protected:
-  std::priority_queue<control_action> queue_;
+  std::priority_queue<control_action, std::vector<control_action>, std::greater<control_action>> queue_;
 };
-
 
 #endif // DSCS_ACTIONS_HPP
