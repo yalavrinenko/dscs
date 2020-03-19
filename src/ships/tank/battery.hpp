@@ -17,4 +17,11 @@ public:
                                 std::move(logger)) {}
 };
 
+template <typename scale_type>
+class battery_config {
+public:
+  static double constexpr mass = 0.25 * scale_type::scale;
+  static double constexpr capacity = 500 * scale_type::scale;
+};
+
 #endif // DSCS_BATTERY_HPP

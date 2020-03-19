@@ -117,4 +117,6 @@ protected:
   double const initial_max_output_power_;
 };
 
+using preactor = std::shared_ptr<reactor>;
+
 #endif // DSCS_REACTOR_HPP

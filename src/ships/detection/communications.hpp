@@ -21,12 +21,12 @@ struct radio_transmitter_option{
   double frequency = 44110;
 };
 
-class radio_transmitter : public icomponent{
+class radio_unit : public icomponent{
 public:
-  radio_transmitter(double mass, radio_transmitter_option option, em_field &field):
+  radio_unit(double mass, radio_transmitter_option option, em_field &field):
       option_{std::move(option)},
       transmission_field_{field},
-      icomponent(mass, "radio", nullptr){
+      icomponent(mass, "radio", nullptr, component_type::radio){
     signal_receiver_ = std::make_shared<radio_receiver>(received_packages);
     transmission_field_.register_receiver(signal_receiver_, option.frequency);
   }
@@ -40,7 +40,18 @@ public:
   }
 
   void log_action() const override {
+    if (logger() != nullptr) {
+      logger()->log("Radio unit:", this->name());
+      logger()->log("Working frequency:", linked_frequency());
+      logger()->log("Power consumption:", power_consumption());
+      logger()->log("Received messages:", received_messages().size());
+    }
+  }
 
+  void set_frequency(double new_freq) {
+    transmission_field_.unregister_receiver(option_.frequency);
+    option_.frequency = new_freq;
+    transmission_field_.register_receiver(signal_receiver_, option_.frequency);
   }
 
   double linked_frequency() const { return option_.frequency; }
@@ -69,6 +80,11 @@ protected:
   em_field& transmission_field_;
 
   double power_consumtion_ {0};
+};
+
+template <typename scale_type>
+struct radio_unit_config{
+  static double constexpr mass = 0.25;
 };
 
 #endif // DSCS_COMMUNICATIONS_HPP

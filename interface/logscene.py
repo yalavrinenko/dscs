@@ -1,12 +1,6 @@
-import glob
-import time
-import os
-import numpy as np
+import sys
 from matplotlib import pyplot as plt
-from io import StringIO
 import matplotlib.animation as anim
-
-
 
 def show_file(filepath, ax):
     def update(i):
@@ -26,7 +20,7 @@ def show_file(filepath, ax):
                     vy.append(values[4])
                     names.append(splitted_line[-1])
         ax.clear()
-        ax.quiver(px, py, vx, vy, headwidth=2)
+        ax.quiver(px, py, vx, vy, scale_units='xy')
 
         for i, txt in enumerate(names):
             ax.annotate(txt, (px[i], py[i]))
@@ -36,9 +30,7 @@ def show_file(filepath, ax):
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1)
 
-file_list = glob.glob("../ramfs/*.map")
-print (file_list)
-update_func = show_file(file_list[0], ax)
+update_func = show_file(sys.argv[1], ax)
 
 a = anim.FuncAnimation(fig, update_func, frames=100, repeat=True, interval=100)
 plt.show()

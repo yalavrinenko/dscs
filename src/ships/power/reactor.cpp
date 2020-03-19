@@ -53,7 +53,7 @@ void reactor::log_action() const  {
 }
 
 reactor::reactor(double mass, reactor_option const &option,
-                 std::string const &name, plogger logger) : icomponent(mass, "Reactor " + name, std::move(logger)), option_(option),
+                 std::string const &name, plogger logger) : icomponent(mass, "Reactor " + name, std::move(logger), component_type::reactor), option_(option),
                  initial_max_output_power_{option_.peak_output}{
   apu_ = std::make_shared<battery_line>(option_.apu.mass, option_.apu.in_power, option.apu.out_power, "APU Line", this->logger());
   apu_->add_tank(option_.apu.capacity, option_.apu.mass);
@@ -88,7 +88,7 @@ void reactor::active_action() {
   current_power_ = fuel * (1.0 / option_.fuel_per_charge) * (charge / required_charge);
 
   auto apu_power = apu_->push(current_power_);
-  auto pushed = option_.output_wire.push(current_power_ - apu_power);
+  option_.output_wire.push(current_power_ - apu_power);
 }
 
 reactor::~reactor() = default;

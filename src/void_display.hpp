@@ -4,11 +4,11 @@
 
 #ifndef DSCS_VOID_DISPLAY_HPP
 #define DSCS_VOID_DISPLAY_HPP
-#include "interface.hpp"
+#include "../utils/logger_factory.hpp"
 #include "common.hpp"
+#include "interface.hpp"
 #include <fstream>
 #include <vector>
-#include "logger_factory.hpp"
 
 std::ofstream& operator << (std::ofstream& out, vector_2d const &v);
 

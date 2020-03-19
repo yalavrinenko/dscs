@@ -33,6 +33,9 @@ public:
     });
   }
 
+  double input_power() const { return MAX_INPUT; }
+  double output_power() const { return MAX_OUTPUT; }
+
   [[nodiscard]]
   double mass() const override {
     return icomponent::mass() + std::accumulate(inputs.begin(), inputs.end(), 0.0, [](auto sum, auto &v){
@@ -101,4 +104,20 @@ private:
 
 template<class tank_type>
 using ptank_adapter = std::shared_ptr<itank_adapter<tank_type>>;
+
+template <typename container_type>
+class resource_line_factory{
+public:
+  template<typename ... bank_args>
+  static std::shared_ptr<container_type> construct_line(double line_mass, double in_q,
+                                      double out_q, std::string name,
+                                      plogger logger, size_t bank_count,
+                                      bank_args ... args){
+    auto container = std::make_shared<container_type>(line_mass, in_q, out_q, std::move(name), std::move(logger));
+    for (auto i = 0ull; i < bank_count; ++i){
+      container->add_tank(args...);
+    }
+    return container;
+  }
+};
 #endif // DSCS_ICONTAINER_ADAPTER_HPP

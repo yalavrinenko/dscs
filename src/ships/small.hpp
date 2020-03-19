@@ -33,7 +33,7 @@ protected:
 
   virtual void construct_engine_system();
 
-  using radar = long_range_radar<radio_transmitter, radio_transmitter_option>;
+  using radar = long_range_radar<radio_unit, radio_transmitter_option>;
 
   std::shared_ptr<radar> radar_;
 };

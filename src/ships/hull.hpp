@@ -21,7 +21,7 @@ public:
 
   void log_action() const override {
     logger()->log("Ship ", name());
-    logger()->log("Mass:", mass());
+    logger()->log("Mass:", this->mass());
 
     logger()->up_level();
     for (auto &c : hull_components_)
@@ -29,10 +29,12 @@ public:
     logger()->down_level();
   }
 
-  double mass() const override { return icomponent::mass() +
-    std::accumulate(hull_components_.begin(), hull_components_.end(), 0, [](auto sum, auto &v){
-      return v->mass();
-    }); }
+  double mass() const override {
+    auto components_mass =  std::accumulate(hull_components_.begin(), hull_components_.end(), 0, [](auto sum, auto &v){
+      return sum + v->mass();
+    });
+    return icomponent::mass() + components_mass;
+    }
 
   void update(timestamp const &time) override {
     action();
@@ -43,12 +45,7 @@ public:
   }
 
   std::vector<control_action> extract_control_actions(timestamp const &ts) override{
-    auto events = control_unit_->control(ts);
-    std::vector<control_action> actions;
-    std::transform(events.begin(), events.end(), std::back_inserter(actions), [this, &ts](auto const& e){
-      return e->action(this->command_interface_, ts);
-    });
-    return actions;
+    return control_unit_->control(ts, command_interface_);
   }
 
   ~ship_hull() override = default;

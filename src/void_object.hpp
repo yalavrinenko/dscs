@@ -4,12 +4,12 @@
 
 #ifndef DSCS_VOID_OBJECT_HPP
 #define DSCS_VOID_OBJECT_HPP
+#include "../utils/logger_factory.hpp"
 #include "common.hpp"
-#include <memory>
-#include "logger_factory.hpp"
+#include "env_interaction.hpp"
 #include "ships/component.hpp"
 #include "ships/control/actions.hpp"
-#include "env_interaction.hpp"
+#include <memory>
 
 class void_object:  public icomponent{
 public:

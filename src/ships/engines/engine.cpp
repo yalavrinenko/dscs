@@ -47,7 +47,7 @@ double engine::mass() const { return icomponent::mass(); }
 
 engine::engine(double mass, engine_option const &option,
                  std::string const &name, plogger logger)
-    : icomponent(mass, "Engine " + name, std::move(logger)), option_(option) {}
+    : icomponent(mass, "Engine " + name, std::move(logger), component_type::engine), option_(option) {}
 
 void engine::align_engine() {
   vector_2d delta {option_.thrust_align_speed, option_.thrust_align_speed};

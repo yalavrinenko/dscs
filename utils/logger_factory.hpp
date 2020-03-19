@@ -15,8 +15,8 @@
 
 class logger_sharedfs_error: std::exception{
 public:
-  explicit logger_sharedfs_error(std::string const &error): error(error){}
-  const char *what() const noexcept override { return error.c_str(); }
+  explicit logger_sharedfs_error(std::string error): error(std::move(error)){}
+  [[nodiscard]] const char *what() const noexcept override { return error.c_str(); }
 
 private:
   std::string error;
@@ -26,7 +26,7 @@ class logger_entry;
 
 class logger_factory {
 public:
-  explicit logger_factory(std::filesystem::path const &ramfs_path): ramfs_path(ramfs_path){};
+  explicit logger_factory(std::filesystem::path ramfs_path): ramfs_path(std::move(ramfs_path)){};
 
   std::shared_ptr<logger_entry> create_logger(std::string const &name, size_t size=1024*10);
 

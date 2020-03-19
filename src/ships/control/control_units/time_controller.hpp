@@ -9,7 +9,7 @@
 
 class timed_control: public icontrol{
 public:
-  std::vector<pcontrol_event> control(timestamp const &ts) override;
+  std::vector<control_action> control(timestamp const &ts, control_interface &ship) override;
 };
 
 #endif // DSCS_TIME_CONTROLLER_HPP

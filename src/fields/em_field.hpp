@@ -82,6 +82,10 @@ public:
     receivers_[frequency] = std::move(receiver);
   }
 
+  void unregister_receiver(double frequency) {
+    receivers_.erase(frequency);
+  }
+
 protected:
   void recieve_packet(field_package const &package);
 

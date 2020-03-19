@@ -48,3 +48,6 @@ target_link_libraries(ship libgtest libgmock pthread stdc++fs logger dscs-lib)
 
 add_executable(signals signals.cpp)
 target_link_libraries(signals libgtest libgmock pthread stdc++fs logger dscs-lib)
+
+add_executable(missile missile.cpp)
+target_link_libraries(missile libgtest libgmock pthread stdc++fs logger dscs-lib)

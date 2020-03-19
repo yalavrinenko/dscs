@@ -18,27 +18,16 @@ private:
   std::string message;
 };
 
-enum class ComponentSize{
-  tiny,
-  small,
-  normal,
-  big,
-  huge
-};
-
-double component_scale(ComponentSize size);
-
 template <class ComponentType, class ComponentOptionType>
 class ComponentFactory{
 public:
-  template <ComponentSize size=ComponentSize::normal>
+  template <typename scale_type>
   static std::shared_ptr<ComponentType> construct(fuel_pipe const &pipe,
       wire const &out_wire,
       std::string name,
       plogger logger){
-    auto scale = component_scale(size);
-    return std::make_shared<ComponentType>(ComponentType::default_mass() * scale,
-                                           ComponentOptionType::make_default(scale, out_wire, pipe),
+    return std::make_shared<ComponentType>(ComponentType::default_mass() * scale_type::scale,
+                                           ComponentOptionType::make_default(scale_type::scale, out_wire, pipe),
                                            std::move(name), std::move(logger));
   }
 };

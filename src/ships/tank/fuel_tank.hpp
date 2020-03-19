@@ -19,4 +19,16 @@ public:
                                 std::move(logger)) {}
 };
 
+struct fuel_type{
+  using liquid = size_scale<1, 100>;
+};
+
+template <typename scale_type, typename fuel_type>
+class fuel_tank_config {
+public:
+  static double constexpr mass = 0.01 * scale_type::scale;
+  static double constexpr capacity = 1000 * scale_type::scale;
+  static double constexpr fuel_mass = fuel_type::scale;
+};
+
 #endif // DSCS_FUEL_TANK_HPP

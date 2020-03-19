@@ -1,6 +1,8 @@
-import glob
+import sys
 import time
 import os
+
+ship_file = sys.argv[1]
 
 def print_file(filepath):
     print("{0}:".format(filepath))
@@ -9,9 +11,7 @@ def print_file(filepath):
         print(content)
 
 while (1):
-    file_list = glob.glob("../ramfs/*.ship")
-    for file in file_list:
-        print_file(file)
+    print_file(ship_file)
 
     time.sleep(0.1)
     os.system("clear")

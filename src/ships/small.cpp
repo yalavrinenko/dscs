@@ -13,7 +13,7 @@ small::small(std::string name, plogger logger):
   wire radar_wire(power_system_.main_battery_);
   radio_transmitter_option r_option{radar_wire};
   radar_ = std::make_unique<radar>(
-      1.0, 5, r_option, this->env_.EM_Field(), "Main Radar",
+      radio_unit_config<component_size::medium>::mass, 5, r_option, this->env_.EM_Field(), "Main Radar",
       this->logger()->factory()->create_logger(this->name() + ".radar"s));
 
   add_component(radar_, true);
@@ -29,19 +29,18 @@ void small::construct_power_system() {
     power_system_.reactor_fuel_->add_tank(FUEL_BACK_SIZE, 0.1, 0.1);
   while (power_system_.reactor_fuel_->push(100.0) > 0);
 
-  power_system_.main_battery_ = std::make_shared<battery_line>(
-      0.2, 100, 100, "Main power line", logger());
-
   unsigned const POWER_BANK_COUNT = 25;
-  double const POWER_BANK_SIZE = 2500;
-  for (auto i = 0; i < POWER_BANK_COUNT; ++i)
-    power_system_.main_battery_->add_tank(POWER_BANK_SIZE, 1.0);
+
+  power_system_.main_battery_ = resource_line_factory<battery_line>::construct_line(
+      0.2, 100, 100, "Main power line", logger(), POWER_BANK_COUNT,
+      battery_config<component_size::medium>::capacity,
+      battery_config<component_size::medium>::mass);
 
   fuel_pipe reactor_pipe(power_system_.reactor_fuel_, power_system_.main_battery_, 0.1);
   wire reactor_out_wire(power_system_.main_battery_);
 
-  power_system_.master_core_ = ReactorFactory::construct<ComponentSize::small>(reactor_pipe, reactor_out_wire, "Master PU", logger());
-  power_system_.slave_core_ = ReactorFactory::construct<ComponentSize::tiny>(reactor_pipe, reactor_out_wire, "Slave PU", logger());
+  power_system_.master_core_ = ReactorFactory::construct<component_size::small>(reactor_pipe, reactor_out_wire, "Master PU", logger());
+  power_system_.slave_core_ = ReactorFactory::construct<component_size::tiny>(reactor_pipe, reactor_out_wire, "Slave PU", logger());
 
   add_component(power_system_.master_core_, true);
   add_component(power_system_.slave_core_, true);
@@ -68,14 +67,14 @@ void small::construct_engine_system() {
 
   wire power_supply(power_system_.main_battery_);
   fuel_pipe main_pipe(engine_system_.main_fuel_, power_system_.main_battery_, 0.1);
-  engine_system_.main_engine_ = EngineFactory::construct<ComponentSize::small>(main_pipe, power_supply, "Master Engine", logger());
+  engine_system_.main_engine_ = EngineFactory::construct<component_size::small>(main_pipe, power_supply, "Master Engine", logger());
 
   add_component(engine_system_.main_engine_, true);
   add_component(engine_system_.main_fuel_);
 
   for (auto i = 0; i < 2; ++i){
     fuel_pipe slave_pipe(engine_system_.slave_fuel_lines_[i], power_system_.main_battery_, 0.1);
-    engine_system_.slave_engine_[i] = EngineFactory::construct<ComponentSize::tiny>(slave_pipe, power_supply, "Slave Engine " + std::to_string((i)), logger());
+    engine_system_.slave_engine_[i] = EngineFactory::construct<component_size::tiny>(slave_pipe, power_supply, "Slave Engine " + std::to_string((i)), logger());
 
     add_component(engine_system_.slave_engine_[i], true);
     add_component(engine_system_.slave_fuel_lines_[i]);

@@ -4,47 +4,19 @@
 
 #include "time_controller.hpp"
 #include "../control_events/base_events.hpp"
-std::vector<pcontrol_event> timed_control::control(timestamp const &ts) {
-  std::vector<pcontrol_event> events;
-  if (ts == timestamp(100)) {
-    auto start_event = std::make_unique<ship_events::reactor_start_event>("Master PU");
-    events.emplace_back(std::move(start_event));
+std::vector<control_action> timed_control::control(timestamp const &ts,
+                                      control_interface &ship) {
+  auto ignite_ts = timestamp{50};
+
+  if (!reactors.ready2use || !engines.ready2use)
+    construct_component_groups(ship);
+
+  if (ts == ignite_ts){
+    auto ignite = [](preactor &reactor){
+      reactor->ignite();
+    };
+    reactors.apply(ignite);
   }
 
-  if (ts == timestamp(150)) {
-    auto start_event = std::make_unique<ship_events::reactor_start_event>("Slave PU");
-    events.emplace_back(std::move(start_event));
-  }
-
-
-  if (ts == timestamp(1000)){
-    events.emplace_back(new ship_events::engine_rotation_event("Master Engine", {1.0, 1.0}));
-    events.emplace_back(new ship_events::engine_rotation_event("Slave Engine 0", {0.0, 1.0}));
-    events.emplace_back(new ship_events::engine_rotation_event("Slave Engine 1", {-1.0, 0.0}));
-  }
-
-  if (ts == timestamp(1500)){
-    events.emplace_back(new ship_events::engine_fire_event("Master Engine", ship_events::engine_fire_event::action_set::ignite));
-    events.emplace_back(new ship_events::engine_fire_event("Slave Engine 0", ship_events::engine_fire_event::action_set::ignite));
-    events.emplace_back(new ship_events::engine_fire_event("Slave Engine 1", ship_events::engine_fire_event::action_set::ignite));
-  }
-
-  if (ts == timestamp(2000)){
-    events.emplace_back(new ship_events::engine_fire_event("Master Engine", ship_events::engine_fire_event::action_set::shutdown));
-    events.emplace_back(new ship_events::engine_fire_event("Slave Engine 0", ship_events::engine_fire_event::action_set::shutdown));
-    events.emplace_back(new ship_events::engine_fire_event("Slave Engine 1", ship_events::engine_fire_event::action_set::shutdown));
-  }
-
-  if (ts == timestamp(3000)){
-    events.emplace_back(new ship_events::engine_fire_event("Master Engine", ship_events::engine_fire_event::action_set::ignite));
-    events.emplace_back(new ship_events::engine_fire_event("Slave Engine 0", ship_events::engine_fire_event::action_set::ignite));
-    events.emplace_back(new ship_events::engine_fire_event("Slave Engine 1", ship_events::engine_fire_event::action_set::ignite));
-  }
-
-  if (ts == timestamp(3500)){
-    events.emplace_back(new ship_events::engine_fire_event("Master Engine", ship_events::engine_fire_event::action_set::shutdown));
-    events.emplace_back(new ship_events::engine_fire_event("Slave Engine 0", ship_events::engine_fire_event::action_set::shutdown));
-    events.emplace_back(new ship_events::engine_fire_event("Slave Engine 1", ship_events::engine_fire_event::action_set::shutdown));
-  }
-  return events;
+  return {};
 }
