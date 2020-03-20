@@ -38,10 +38,10 @@ add_executable(adapter adapter.cpp)
 target_link_libraries(adapter libgtest libgmock pthread stdc++fs logger)
 
 add_executable(reactor reactor.cpp)
-target_link_libraries(reactor libgtest libgmock pthread stdc++fs logger dscs-lib)
+target_link_libraries(reactor libgtest libgmock pthread stdc++fs logger dscs-lib gui)
 
 add_executable(engine engine.cpp)
-target_link_libraries(engine libgtest libgmock pthread stdc++fs logger dscs-lib)
+target_link_libraries(engine libgtest libgmock pthread stdc++fs logger dscs-lib gui)
 
 add_executable(ship ship.cpp)
 target_link_libraries(ship libgtest libgmock pthread stdc++fs logger dscs-lib)

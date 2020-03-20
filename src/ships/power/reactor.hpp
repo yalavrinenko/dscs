@@ -4,6 +4,7 @@
 
 #ifndef DSCS_REACTOR_HPP
 #define DSCS_REACTOR_HPP
+#include "../../../utils/gui_entries.hpp"
 #include "../component.hpp"
 #include "../tank/battery_adapter.hpp"
 #include "../tank/pipe_and_wire.hpp"
@@ -51,11 +52,12 @@ namespace std{
 std::string to_string(reactor_state const &state);
 }
 
-class reactor : public icomponent {
+class reactor : public icomponent{
 public:
   reactor(double mass, reactor_option const &option, std::string const &name,
           plogger logger);
 
+  void draw() override;
   void action() override {
     for (auto &component: components_)
       component->action();
@@ -115,6 +117,11 @@ protected:
   std::vector<pscomponent> components_;
 
   double const initial_max_output_power_;
+
+  struct{
+    int text;
+    int num;
+  } guis_;
 };
 
 using preactor = std::shared_ptr<reactor>;

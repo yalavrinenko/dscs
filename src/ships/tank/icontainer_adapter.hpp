@@ -4,16 +4,21 @@
 
 #ifndef DSCS_ICONTAINER_ADAPTER_HPP
 #define DSCS_ICONTAINER_ADAPTER_HPP
+#include "../../../utils/gui_entries.hpp"
 #include "../component.hpp"
-#include <vector>
-#include <numeric>
 #include <algorithm>
+#include <numeric>
+#include <vector>
 
 template <class accumulative_tank_type>
 class itank_adapter : public icomponent {
 public:
   itank_adapter(double mass, double input_power, double output_power, std::string name, plogger logger)
-      : icomponent(mass, std::move(name), std::move(logger)), MAX_INPUT(input_power), MAX_OUTPUT(output_power) {}
+      : icomponent(mass, std::move(name), std::move(logger)), MAX_INPUT(input_power), MAX_OUTPUT(output_power) {
+      guis_.num = this->add_gui_entry<gui::numeric_entry>(this->name());
+      guis_.plot = this->add_gui_entry<gui::moving_plot_entry>(this->name(), 100);
+      guis_.hplot = add_gui_entry<gui::histo_plot_entry>(this->name());
+  }
 
 
   void action() override {
@@ -32,6 +37,8 @@ public:
       return sum + v->max_capacity();
     });
   }
+
+  double percent_load() const { return capacity() / max_capacity(); }
 
   double input_power() const { return MAX_INPUT; }
   double output_power() const { return MAX_OUTPUT; }
@@ -78,6 +85,7 @@ public:
       double max{0};
       double consumption{0};
     } info{};
+
     std::for_each(inputs.begin(), inputs.end(), [&info](auto const &v){
       info.current += v->capacity();
       info.max += v->max_capacity();
@@ -86,6 +94,36 @@ public:
 
     this->logger()->log("\t(left/total/consumption)", "(", info.current, "/", info.max, "/", info.consumption, ")");
     this->logger()->log("\tMass:", this->mass());
+  }
+
+  void draw() override {
+    auto num = this->entry<gui::numeric_entry>(guis_.num);
+    auto plot = this->entry<gui::moving_plot_entry>(guis_.plot);
+    num->log("Mass:", this->mass());
+
+    struct {
+      double current{0};
+      double max{0};
+      double consumption{0};
+      std::vector<double> amount{};
+    } info{};
+    info.amount.resize(inputs.size());
+
+    std::for_each(inputs.begin(), inputs.end(), [&info](auto const &v){
+      info.current += v->capacity();
+      info.max += v->max_capacity();
+      info.consumption += v->consumption();
+    });
+    auto selection_function = [this](int i) -> double{
+      if (i == -1)
+        return inputs.size();
+      else
+        return inputs[i]->capacity() / inputs[i]->max_capacity();
+    };
+
+    num->log("Total:", info.current, info.max);
+    plot->log("Flow:", info.consumption);
+    entry<gui::histo_plot_entry>(guis_.hplot)->log("Banks", selection_function);
   }
 
   template <class ... TArgs>
@@ -97,6 +135,11 @@ protected:
   using stored_container_ptr = std::shared_ptr<accumulative_tank_type>;
   std::vector<stored_container_ptr> inputs;
 
+  struct {
+    int num;
+    int plot;
+    int hplot;
+  } guis_;
 private:
   double const MAX_INPUT;
   double const MAX_OUTPUT;

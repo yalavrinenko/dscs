@@ -4,6 +4,8 @@
 
 #include "engine.hpp"
 void engine::action() {
+  current_fuel_comsumption_ = current_power_consumption_ = 0;
+
   if (align_angle() != 0)
     align_engine();
 
@@ -47,7 +49,12 @@ double engine::mass() const { return icomponent::mass(); }
 
 engine::engine(double mass, engine_option const &option,
                  std::string const &name, plogger logger)
-    : icomponent(mass, "Engine " + name, std::move(logger), component_type::engine), option_(option) {}
+    : icomponent(mass, "Engine " + name, std::move(logger), component_type::engine), option_(option) {
+  add_gui_entry<gui::text_entry>(this->name());
+  add_gui_entry<gui::numeric_entry>(this->name());
+  add_gui_entry<gui::moving_plot_entry>(this->name(), 100);
+  add_gui_entry<gui::polar_entry>(this->name(), 1.0);
+}
 
 void engine::align_engine() {
   vector_2d delta {option_.thrust_align_speed, option_.thrust_align_speed};
@@ -72,4 +79,34 @@ void engine::align_engine() {
 
   current_power_consumption_ += charge;
   current_thrust_direction_ = current_thrust_direction_ + delta;
+}
+
+void engine::draw() {
+  auto ltext = entry<gui::text_entry>();
+  if (ltext)
+    ltext->log("State:", (current_state_ == engine_state::active) ? "Active" : "Disable");
+
+  auto lplot = entry<gui::moving_plot_entry>();
+  if (lplot) {
+    lplot->log("Fuel consumption:", current_fuel_comsumption_);
+    lplot->log("Power consumption:", current_power_consumption_);
+  }
+
+  auto nplot = entry<gui::numeric_entry>();
+  if (nplot)
+    nplot->log("Current thrust_level:", current_thrust_, option_.max_thrust);
+
+
+  std::stringstream ss;
+
+  auto thrust_direction = [this](int i) -> std::pair<double, double>{
+    if (i == -1) return {1, 1};
+    return {current_thrust_direction_.in_polar().x, current_thrust_direction_.in_polar().y};
+  };
+
+  ss << "Target align angle:\t" << align_angle() << "\n"
+    << "Polar angle (r, phi):\t" << "(" << thrust_direction(0).first <<", " << thrust_direction(0).second << ")";
+
+  auto pplot = entry<gui::polar_entry>();
+  pplot->log(ss.str(), thrust_direction);
 }

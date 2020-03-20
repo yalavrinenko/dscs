@@ -20,7 +20,9 @@ TEST(adapters, evolution_with_wire){
   while (fuel_line->push(1.0) > 0);
 
   auto general_battery_line = std::make_shared<battery_line>(100, 2.0, 5.0, "General line", factory.create_logger("Battery line"));
-  general_battery_line->add_tank(1000, 5.0);
+  general_battery_line->add_tank(1000, 10.0);
+  general_battery_line->add_tank(1000, 10.0);
+  general_battery_line->add_tank(500, 10.0);
 
   wire electric_wire(general_battery_line);
   fuel_pipe pipe(fuel_line, general_battery_line, 0.1);
@@ -28,7 +30,7 @@ TEST(adapters, evolution_with_wire){
   reactor_option r_option{
       {
         10.0,
-        100.0,
+        50.0,
         1.0,
         5.0
       },
@@ -40,9 +42,11 @@ TEST(adapters, evolution_with_wire){
       1.0
   };
 
-  auto  power_unit = std::make_shared<reactor>(1000.0, r_option, "Main power unit"s, factory.create_logger("Reactor"));
-  auto  power_unit_1 = std::make_shared<reactor>(1000.0, r_option, "Main power unit"s, factory.create_logger("Reactor 1"));
-  auto  power_unit_2 = std::make_shared<reactor>(1000.0, r_option, "Main power unit"s, factory.create_logger("Reactor 2"));
+  auto gui = gui::logger_factory::create("Ship1");
+
+  auto  power_unit = std::make_shared<reactor>(1000.0, r_option, "Main power unit_1"s, factory.create_logger("R1"));
+  auto  power_unit_1 = std::make_shared<reactor>(1000.0, r_option, "Main power unit_2"s, factory.create_logger("R2"));
+  auto  power_unit_2 = std::make_shared<reactor>(1000.0, r_option, "Main power unit_3"s, factory.create_logger("R3"));
 
   for (auto i = 0; i < 200000; ++i){
     if (i == 10)
@@ -56,16 +60,19 @@ TEST(adapters, evolution_with_wire){
 
     auto manipulate = [](auto &container){
       container->action();
-      container->log_action();
+      //container->log_action();
+      container->draw();
     };
 
     manipulate(power_unit);
     manipulate(power_unit_1);
     manipulate(power_unit_2);
+
     manipulate(fuel_line);
     manipulate(general_battery_line);
 
     factory.flush_loggers();
+    gui->flush();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }

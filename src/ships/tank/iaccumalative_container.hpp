@@ -4,6 +4,7 @@
 
 #ifndef DSCS_IACC_CONTAINER_HPP
 #define DSCS_IACC_CONTAINER_HPP
+#include "../../../utils/gui_entries.hpp"
 #include "../component.hpp"
 
 class iaccumalative_container : public icomponent {
@@ -12,7 +13,8 @@ public:
                           plogger logger)
       : icomponent(mass, std::move(name), std::move(logger)),
         MAX_CAPACITY_(max_capacity),
-        mass_pp_(mass_pp){}
+        mass_pp_(mass_pp){
+  }
 
   void action() override {
   }
@@ -45,6 +47,8 @@ public:
     this->logger()->log("\tMass:", this->mass());
   }
 
+  void draw() override {}
+
   double consumption() const {
     auto consumption_value = consumption_;
     consumption_ = 0.0;
@@ -59,7 +63,7 @@ protected:
   double const MAX_CAPACITY_;
   mutable double consumption_{0};
   double mass_pp_;
-
+  int gui_;
 };
 
 using piacc_container = std::shared_ptr<iaccumalative_container>;

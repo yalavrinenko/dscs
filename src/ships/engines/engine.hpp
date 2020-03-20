@@ -76,7 +76,7 @@ public:
     norm.norm();
     return norm * current_thrust_;
   }
-
+  void draw() override;
   static constexpr double default_mass(){ return 10.0;  }
 protected:
   virtual void align_engine();

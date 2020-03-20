@@ -18,7 +18,7 @@ enum class component_type{
   none
 };
 
-class icomponent{
+class icomponent: public gui::igui_object{
 public:
   icomponent(double mass, std::string name, plogger logger, component_type type = component_type::none)
       : mass_(mass), logger_(std::move(logger)), name_(std::move(name)), type_(type) {}
@@ -26,6 +26,8 @@ public:
   virtual void action() = 0;
 
   virtual void log_action() const = 0;
+
+  void draw() override {}
 
   [[nodiscard]]
   virtual double mass() const {

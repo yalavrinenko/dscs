@@ -11,16 +11,19 @@
 #include <thread>
 
 TEST(adapters, evolution_with_wire){
-  logger_factory factory("../../ramfs");
-  auto fuel_line = std::make_shared<fuel_tank_line>(100, 2.0, 5.0, "General line", factory.create_logger("Reactor fuel line"));
+  auto gui = gui::logger_factory::create("Ship1");
+
+  auto fuel_line = std::make_shared<fuel_tank_line>(100, 2.0, 5.0, "Reactor fuel", nullptr);
+  fuel_line->add_tank(200, 1.0, 2.0);
+  fuel_line->add_tank(200, 1.0, 2.0);
   fuel_line->add_tank(200, 1.0, 2.0);
   while (fuel_line->push(1.0) > 0);
 
-  auto engine_fuel = std::make_shared<fuel_tank_line>(100, 2.0, 10.0, "General line", factory.create_logger("Engine fuel line"));
+  auto engine_fuel = std::make_shared<fuel_tank_line>(100, 2.0, 10.0, "Engine fuel", nullptr);
   engine_fuel->add_tank(2000, 1.0, 2.0);
   while (engine_fuel->push(2.0) > 0);
 
-  auto general_battery_line = std::make_shared<battery_line>(100, 2.0, 5.0, "General line", factory.create_logger("Main battery line"));
+  auto general_battery_line = std::make_shared<battery_line>(100, 2.0, 10.0, "Power line", nullptr);
   general_battery_line->add_tank(1000, 5.0);
 
   wire electric_wire(general_battery_line);
@@ -42,7 +45,7 @@ TEST(adapters, evolution_with_wire){
       1.0
   };
 
-  auto  power_unit = std::make_shared<reactor>(1000.0, r_option, "Main power unit"s, factory.create_logger("Reactor"));
+  auto  power_unit = std::make_shared<reactor>(1000.0, r_option, "Reactor Main "s, nullptr);
 
   engine_option e_option{
     10.0,
@@ -54,9 +57,9 @@ TEST(adapters, evolution_with_wire){
     1.0
   };
 
-  auto engine = std::make_shared<small_engine>(e_option, "Initial engine", factory.create_logger("Engine_1"));
+  auto eng = std::make_shared<engine>(10000, e_option, "Initial engine", nullptr);
 
-  std::vector<pscomponent> components{fuel_line, engine_fuel, general_battery_line, power_unit, engine};
+  std::vector<pscomponent> components{fuel_line, engine_fuel, general_battery_line, power_unit, eng};
 
   auto is_ignite = false;
   for (auto i = 0; i < 200000; ++i){
@@ -64,11 +67,16 @@ TEST(adapters, evolution_with_wire){
       power_unit->ignite();
 
     if (i == 0)
-      engine->align({1, 1});
+      eng->align({-1, -1});
 
-    if (!std::isnan(engine->align_angle()) && engine->align_angle() < 1.0 && !is_ignite && i > 500) {
-      engine->ignite();
+    if (!std::isnan(eng->align_angle()) && eng->align_angle() < 1.0 && !is_ignite && i > 500 && general_battery_line->percent_load() > 0.9) {
+      eng->ignite();
       is_ignite = true;
+    }
+
+    if (general_battery_line->percent_load() < 0.1) {
+      eng->shutdown();
+      is_ignite = false;
     }
 
     if (i > 500 && power_unit->state() == reactor_state::shutdown)
@@ -78,9 +86,9 @@ TEST(adapters, evolution_with_wire){
       component->action();
 
     for (auto &component: components)
-      component->log_action();
+      component->draw();
 
-    factory.flush_loggers();
+    gui->flush();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }

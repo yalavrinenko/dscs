@@ -12,6 +12,8 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include "guilogger.hpp"
+#include "igui_object.hpp"
 
 class logger_sharedfs_error: std::exception{
 public:
@@ -105,5 +107,6 @@ protected:
 };
 
 using plogger = std::shared_ptr<logger_entry>;
+using pgui_logger = std::shared_ptr<gui::logger_factory>;
 
 #endif // DSCS_LOGGER_FACTORY_HPP

@@ -14,13 +14,14 @@ void void_map::update() {
 
   integrate();
 
-  dump();
-
   propagate_signals(time);
 
   update_actions(time);
 
+  dump();
+
   logger_factory_->flush_loggers();
+  gui::logger_factory::create()->flush();
 
   while (actions_.invoke_next(time));
 }
@@ -35,6 +36,7 @@ void void_map::integrate() {
 
 void void_map::dump() const{
   for (auto const &o: objects){
+    o.object->draw();
     o.object->log_action();
     display->dump_object(o.position, o.velocity, time, o.object->name());
   }

@@ -12,7 +12,15 @@
 class ship_hull: public void_object{
 public:
   ship_hull(double hull_mass, std::string name, plogger logger):
-      void_object(hull_mass, std::move(name), std::move(logger)){}
+      void_object(hull_mass, std::move(name), std::move(logger)){
+    add_gui_entry<gui::numeric_entry>(this->name());
+  }
+
+  void draw() override {
+    entry<gui::numeric_entry>()->log("Mass:", this->mass());
+    for (auto &c : hull_components_)
+      c->draw();
+  }
 
   void action() override {
     for (auto &c : hull_components_)
