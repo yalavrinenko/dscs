@@ -17,7 +17,7 @@ find_package(X11)
 
 set(GUI_SRC utils/guilogger.cpp utils/guilogger.hpp utils/gui_entries.cpp utils/gui_entries.hpp)
 add_library(gui SHARED ${GUI_SRC})
-include_directories(~/.local/include)
+include_directories(~/.local/include ${CMAKE_CURRENT_SOURCE_DIR})
 
 include(FetchContent)
 FetchContent_Declare(

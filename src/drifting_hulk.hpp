@@ -13,7 +13,7 @@ static int halk_count_ = 0;
 class drifting_hulk: public void_object {
 public:
   explicit drifting_hulk(double mass): void_object(mass, "Space_hulk_"s + std::to_string(++halk_count_),
-                    nullptr){
+                                                   {nullptr, nullptr}){
   }
 
   void update(timestamp const &time) override {}
@@ -23,7 +23,7 @@ public:
   void action() override {}
 
   void log_action() const override {}
-
+  void draw() override {}
   std::vector<control_action>
   extract_control_actions(timestamp const &ts) override { return {}; }
 };

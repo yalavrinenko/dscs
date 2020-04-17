@@ -12,7 +12,7 @@
 namespace gui {
 class text_entry : public ilogger_entry {
 public:
-  explicit text_entry(std::shared_ptr<class logger_factory> f, std::string name)
+  explicit text_entry(std::shared_ptr<class logger_window> f, std::string name)
       : ilogger_entry(std::move(f),std::move(name)) {}
   void log(std::string key, std::string const &value) {
     text_data_.tmp().emplace_back(std::move(key), value);
@@ -31,7 +31,7 @@ protected:
 
 class numeric_entry : public text_entry {
 public:
-  explicit numeric_entry(std::shared_ptr<class logger_factory> f,
+  explicit numeric_entry(std::shared_ptr<class logger_window> f,
                          std::string name): text_entry(std::move(f), std::move(name)) {}
 
   void log(std::string key, double value, double max = 0) {
@@ -57,7 +57,7 @@ protected:
 
 class moving_plot_entry: public ilogger_entry{
 public:
-  explicit moving_plot_entry(std::shared_ptr<class logger_factory> f, std::string name, size_t N)
+  explicit moving_plot_entry(std::shared_ptr<class logger_window> f, std::string name, size_t N)
   : ilogger_entry(std::move(f), std::move(name)), N_{N}{ }
 
   void log(std::string key, double value){
@@ -81,7 +81,7 @@ class histo_plot_entry: public ilogger_entry{
 public:
   using unary_function = std::function<double(int)>;
 
-  explicit histo_plot_entry(std::shared_ptr<class logger_factory> factory,
+  explicit histo_plot_entry(std::shared_ptr<class logger_window> factory,
                             std::string name);
   void flush() override;
 
@@ -99,7 +99,7 @@ public:
 
   static inline double pi() { return std::atan(1.0) * 4.0; }
 
-  explicit polar_entry(std::shared_ptr<class logger_factory> factory,
+  explicit polar_entry(std::shared_ptr<class logger_window> factory,
                        std::string name, double max_r);
   void log(std::string key, unary_function const &function){
     data_.tmp().emplace_back(std::move(key), function);
@@ -110,6 +110,36 @@ protected:
 
   cloned_data<std::pair<std::string, unary_function>> data_;
   double const max_r_;
+};
+
+class radar_entry: public ilogger_entry{
+public:
+
+  struct radar_point{
+    double r;
+    double phi;
+    std::string description;
+  };
+
+  using unary_function = std::function<std::pair<double, double>(int)>;
+
+  static inline double pi() { return std::atan(1.0) * 4.0; }
+
+  explicit radar_entry(std::shared_ptr<class logger_window> factory,
+                       std::string name, double max_r, size_t segments);
+
+  void log(radar_point point){
+    data_.tmp().emplace_back(point);
+  }
+
+  void flush() override { data_.swap(); }
+
+protected:
+  void draw_impl() override;
+
+  cloned_data<radar_point> data_;
+  double const max_r_;
+  size_t segments_{1};
 };
 } // namespace gui
 #endif // DSCS_GUI_ENTRIES_HPP

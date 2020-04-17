@@ -21,6 +21,7 @@ protected:
     std::shared_ptr<reactor> master_core_, slave_core_;
     pfuel_tank_line reactor_fuel_;
     pbattery_line main_battery_;
+    pbattery_line apu_;
   } power_system_;
 
   virtual void construct_power_system();

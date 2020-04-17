@@ -6,17 +6,24 @@
 #include "../control_events/base_events.hpp"
 std::vector<control_action> timed_control::control(timestamp const &ts,
                                       control_interface &ship) {
-  auto ignite_ts = timestamp{50};
+  auto ignite_ts_1 = timestamp{50};
+  auto ignite_ts_2 = timestamp{400};
 
   if (!reactors.ready2use || !engines.ready2use)
     construct_component_groups(ship);
 
-  if (ts == ignite_ts){
-    auto ignite = [](preactor &reactor){
-      reactor->ignite();
-    };
-    reactors.apply(ignite);
+  auto ignite = [](preactor &reactor){
+    reactor->ignite();
+  };
+
+  if (ts == ignite_ts_1){
+    reactors.devices[0]->ignite();
   }
+
+  if (ts == ignite_ts_2){
+    reactors.devices[1]->ignite();
+  }
+
 
   return {};
 }

@@ -128,7 +128,7 @@ public:
 
   template <class ... TArgs>
   void add_tank(TArgs ... args){
-    inputs.emplace_back(std::make_shared<accumulative_tank_type>(args..., logger()));
+    inputs.emplace_back(std::make_shared<accumulative_tank_type>(args..., slogger()));
   }
 
 protected:

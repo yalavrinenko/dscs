@@ -11,11 +11,13 @@
 #include "void_display.hpp"
 #include "ships/control/actions.hpp"
 #include "env_interaction.hpp"
+#include "utils/guilogger.hpp"
 
 class void_map: std::enable_shared_from_this<void_map> {
 public:
-  explicit void_map(std::shared_ptr<logger_factory> log_factory):
-    logger_factory_(std::move(log_factory)){
+  explicit void_map(std::shared_ptr<logger_factory> log_factory, std::shared_ptr<gui::logger_environment> gui_factory):
+    logger_factory_(std::move(log_factory)),
+    gui_factory_{std::move(gui_factory)}{
     display = std::make_unique<void_display>(logger_factory_->create_logger("void_display.map"));
   }
 
@@ -64,6 +66,7 @@ public:
 
   mutable std::unique_ptr<void_display> display;
   std::shared_ptr<logger_factory> logger_factory_;
+  std::shared_ptr<gui::logger_environment> gui_factory_;
 
   bool exit_ = false;
 

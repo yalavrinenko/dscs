@@ -6,6 +6,7 @@
 #define DSCS_RADAR_HPP
 
 #include "communications.hpp"
+#include <unordered_map>
 
 struct radar_data{
   size_t range_circle{};
@@ -20,6 +21,26 @@ public:
                    std::string name, plogger logger): icomponent(mass, std::move(name), std::move(logger)),
                    device_{1.0, std::move(option), field},
                    range_{range}{
+    add_gui_entry<gui::numeric_entry>(this->name());
+    add_gui_entry<gui::moving_plot_entry>(this->name(), 100);
+    add_gui_entry<gui::radar_entry>(this->name(), range_ * PhysUnit::EM_SPEED(), range_);
+
+    num_log_ = entry<gui::numeric_entry>(0);
+    plot_log_ = entry<gui::moving_plot_entry>(1);
+    radar_log_ = entry<gui::radar_entry>(2);
+  }
+
+  void draw() override {
+    auto nlog  = entry<gui::numeric_entry>();
+    num_log_->log("Working frequency", device_.linked_frequency());
+    num_log_->log("Target detected count:", data_.size());
+    num_log_->log("Target tracked count:", 0);
+    plot_log_->log("Power consumption", device_.power_consumption());
+
+    for (auto &[k, v]: data_){
+      for (auto &point: v)
+        radar_log_->log({point.position.x, point.position.y, std::to_string(point.range_circle)});
+    }
   }
 
   void action() override{
@@ -28,16 +49,15 @@ public:
     if (is_active()) {
       if (timer_ == 0) {
         device_.send_message("", range_);
-      }
-      if (timer_ == 1){
-        data_.clear();
+      } else {
+        data_[timer_].clear();
       }
 
       auto &received_data = device_.received_messages();
       std::for_each(received_data.begin(), received_data.end(),
                     [this](field_package const &p) {
                       if (!p.is_origin())
-                        data_.emplace_back(radar_data{timer_, p.source_location()});
+                        data_[timer_].emplace_back(radar_data{timer_, p.source_location()});
                     });
 
       timer_ = (timer_ + 1) % (2 * range_);
@@ -47,12 +67,6 @@ public:
 
   void log_action() const override{
     logger()->log("Power consumption:", device_.power_consumption());
-    logger()->log("Targets:");
-    logger()->up_level();
-    for (auto &o : data_){
-      logger()->log(o.range_circle, o.position.x, o.position.y);
-    }
-    logger()->down_level();
   }
 
   double mass() const override { return icomponent::mass() + device_.mass(); }
@@ -65,7 +79,11 @@ public:
   void deactivate() const { return is_active_ = false; }
 
 protected:
-  std::vector<radar_data> data_;
+  std::unordered_map<size_t, std::vector<radar_data>> data_;
+
+  std::shared_ptr<gui::moving_plot_entry> plot_log_;
+  std::shared_ptr<gui::numeric_entry> num_log_;
+  std::shared_ptr<gui::radar_entry> radar_log_;
 
   __transmission_device device_;
   size_t range_;

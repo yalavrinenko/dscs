@@ -20,8 +20,10 @@ void void_map::update() {
 
   dump();
 
-  logger_factory_->flush_loggers();
-  gui::logger_factory::create()->flush();
+  //logger_factory_->flush_loggers();
+  if (gui_factory_){
+    gui_factory_->draw();
+  }
 
   while (actions_.invoke_next(time));
 }

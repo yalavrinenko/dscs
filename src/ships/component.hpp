@@ -21,13 +21,17 @@ enum class component_type{
 class icomponent: public gui::igui_object{
 public:
   icomponent(double mass, std::string name, plogger logger, component_type type = component_type::none)
-      : mass_(mass), logger_(std::move(logger)), name_(std::move(name)), type_(type) {}
+      : gui::igui_object(std::move(logger.gui_window)), mass_(mass),
+      logger_(std::move(logger.text_logger)),
+      name_(std::move(name)), type_(type),
+      loggers_{logger_, window_}
+      {}
 
   virtual void action() = 0;
 
   virtual void log_action() const = 0;
 
-  void draw() override {}
+  //void draw() override {}
 
   [[nodiscard]]
   virtual double mass() const {
@@ -40,12 +44,17 @@ public:
 protected:
   double mass_{};
 
-  plogger& logger() const {
+  ptext_logger& logger() const {
     return logger_;
   }
 
+  plogger& slogger() {
+    return loggers_;
+  }
+
 private:
-  mutable plogger logger_ = nullptr;
+  mutable ptext_logger logger_ = nullptr;
+  plogger loggers_;
   std::string name_;
   component_type type_;
 };

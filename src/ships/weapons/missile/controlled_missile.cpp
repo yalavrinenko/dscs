@@ -11,17 +11,17 @@
 missile::missile(double comm_freq, size_t uid, std::string name, plogger logger)
     : ship_hull(0.25, std::move(name), std::move(logger)), uid(uid) {
 
-  battery_ = resource_line_factory<battery_line>::construct_line(0.01, 10, 50, "Battery", this->logger(),
+  battery_ = resource_line_factory<battery_line>::construct_line(0.01, 10, 50, "Battery", this->slogger(),
       6, battery_config<component_size::tiny>::capacity, battery_config<component_size::tiny>::mass);
 
-  fuel_ = resource_line_factory<fuel_tank_line>::construct_line(0.5, 10, 50, "Fuel", this->logger(), 20,
+  fuel_ = resource_line_factory<fuel_tank_line>::construct_line(0.5, 10, 50, "Fuel", this->slogger(), 20,
       fuel_tank_config<component_size::tiny, fuel_type::liquid>::capacity,
       fuel_tank_config<component_size::tiny, fuel_type::liquid>::mass,
       fuel_tank_config<component_size::tiny, fuel_type::liquid>::fuel_mass);
 
   wire power_supply(battery_);
   fuel_pipe main_pipe(fuel_, battery_, 0.05);
-  engine_ = EngineFactory::construct<component_size::tiny>(main_pipe, power_supply, "Engine", this->logger());
+  engine_ = EngineFactory::construct<component_size::tiny>(main_pipe, power_supply, "Engine", this->slogger());
 
   wire radar_wire(battery_);
   radio_transmitter_option r_option{radar_wire};

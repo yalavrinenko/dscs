@@ -11,7 +11,7 @@
 #include <thread>
 
 TEST(adapters, evolution_with_wire){
-  auto gui = gui::logger_factory::create("Ship1");
+  auto gui = gui::logger_window::create("Ship1");
 
   auto fuel_line = std::make_shared<fuel_tank_line>(100, 2.0, 5.0, "Reactor fuel", nullptr);
   fuel_line->add_tank(200, 1.0, 2.0);

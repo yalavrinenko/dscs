@@ -42,7 +42,7 @@ TEST(adapters, evolution_with_wire){
       1.0
   };
 
-  auto gui = gui::logger_factory::create("Ship1");
+  auto gui = gui::logger_window::create("Ship1");
 
   auto  power_unit = std::make_shared<reactor>(1000.0, r_option, "Main power unit_1"s, factory.create_logger("R1"));
   auto  power_unit_1 = std::make_shared<reactor>(1000.0, r_option, "Main power unit_2"s, factory.create_logger("R2"));

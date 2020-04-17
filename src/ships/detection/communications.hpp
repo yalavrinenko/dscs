@@ -26,7 +26,7 @@ public:
   radio_unit(double mass, radio_transmitter_option option, em_field &field):
       option_{std::move(option)},
       transmission_field_{field},
-      icomponent(mass, "radio", nullptr, component_type::radio){
+      icomponent(mass, "radio", {nullptr, nullptr}, component_type::radio){
     signal_receiver_ = std::make_shared<radio_receiver>(received_packages);
     transmission_field_.register_receiver(signal_receiver_, option.frequency);
   }
@@ -46,6 +46,9 @@ public:
       logger()->log("Power consumption:", power_consumption());
       logger()->log("Received messages:", received_messages().size());
     }
+  }
+
+  void draw() override {
   }
 
   void set_frequency(double new_freq) {

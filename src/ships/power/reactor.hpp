@@ -13,13 +13,6 @@
 using namespace std::string_literals;
 
 struct reactor_option {
-  struct {
-    double mass;
-    double capacity;
-    double in_power;
-    double out_power;
-  } apu;
-
   fuel_pipe nuclear_fuel;
   wire output_wire;
 
@@ -32,13 +25,12 @@ struct reactor_option {
 
   static reactor_option make_default(double scale, wire const &out_wire,
                                      fuel_pipe const &fuel) {
-    return {{1.0 * scale, 500.0 * 2 * scale, 1.0 * scale, 5.0 * scale},
-            fuel,
+    return {fuel,
             out_wire,
             20.0 * scale,
             0.01 * scale,
-            0.1 * scale,
-            0.1 * scale};
+            0.05 * scale,
+            10.0 * scale};
   }
 };
 
@@ -54,7 +46,7 @@ std::string to_string(reactor_state const &state);
 
 class reactor : public icomponent{
 public:
-  reactor(double mass, reactor_option const &option, std::string const &name,
+  reactor(double mass, reactor_option const &option, std::string const &name, pbattery_line apu,
           plogger logger);
 
   void draw() override;

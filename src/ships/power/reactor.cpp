@@ -53,13 +53,11 @@ void reactor::log_action() const  {
 }
 
 reactor::reactor(double mass, reactor_option const &option,
-                 std::string const &name, plogger logger) : icomponent(mass, "Reactor " + name, std::move(logger), component_type::reactor), option_(option),
-                 initial_max_output_power_{option_.peak_output}{
-  apu_ = std::make_shared<battery_line>(option_.apu.mass, option_.apu.in_power, option.apu.out_power, name + "APU Line"s, this->logger());
-  apu_->add_tank(option_.apu.capacity, option_.apu.mass);
-  while (apu_->push(option_.apu.in_power) > 0);
-
-  components_.push_back(apu_);
+                 std::string const &name, pbattery_line apu,
+                 plogger logger) : icomponent(mass, "Reactor " + name, std::move(logger), component_type::reactor), option_(option),
+                 initial_max_output_power_{option_.peak_output},
+                 apu_{std::move(apu)}{
+  //components_.push_back(apu_);
 
   using namespace gui;
   guis_.text = this->add_gui_entry<text_entry>(this->name());

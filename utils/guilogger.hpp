@@ -18,28 +18,27 @@
 namespace gui {
 class ilogger_entry{
 public:
-  explicit ilogger_entry(std::shared_ptr<class logger_factory> factory, std::string name);
+  explicit ilogger_entry(std::shared_ptr<class logger_window> factory, std::string name);
   virtual void draw();
   virtual void flush() = 0;
 
-  std::shared_ptr<class logger_factory>& factory() { return linked_factory_; }
+  std::shared_ptr<class logger_window>& factory() { return linked_factory_; }
 protected:
   virtual void draw_impl() = 0;
-  std::shared_ptr<class logger_factory> linked_factory_;
+  std::shared_ptr<class logger_window> linked_factory_;
   std::string name_;
   std::mutex io_mutex;
 };
 
-class logger_factory : public std::enable_shared_from_this<logger_factory> {
+class logger_window: public std::enable_shared_from_this<logger_window> {
 public:
-  static std::shared_ptr<logger_factory> create(std::string name="") {
-    static auto factory = std::shared_ptr<logger_factory>(new logger_factory(std::move(name)));
-    return factory;
+  static std::shared_ptr<logger_window> create(std::string name="") {
+    return std::shared_ptr<logger_window>(new logger_window(std::move(name)));
   }
 
   void draw();
 
-  bool is_active() const { return window_.isOpen() && !closed_; }
+  bool is_open() const { return window_.isOpen(); }
 
   template <typename LoggerType, typename ... TInitArgs>
   std::shared_ptr<LoggerType> create_logger(TInitArgs&& ... args){
@@ -53,13 +52,12 @@ public:
       e->flush();
   }
 
-  ~logger_factory();
+  ~logger_window();
 protected:
-  explicit logger_factory(std::string name)
-      : factory_name_{std::move(name)},
-        window_(sf::VideoMode(1280, 1000), factory_name_) {
+  explicit logger_window(std::string name)
+      : window_title_{std::move(name)},
+        window_(sf::VideoMode(1800, 1000), window_title_) {
     init_window();
-    wthread_ = std::async(std::launch::async, [this](){ this-> draw(); });
   }
 
   void init_window();
@@ -67,14 +65,49 @@ protected:
   void events();
 
 private:
-  std::string factory_name_;
+  std::string window_title_;
   sf::RenderWindow window_;
+  sf::Clock delta_clock_;
   ImGuiContext* ctx_{nullptr};
   std::vector<std::shared_ptr<ilogger_entry>> entries_;
+};
+
+using plog_window = std::shared_ptr<logger_window>;
+
+class logger_environment : public std::enable_shared_from_this<logger_environment> {
+public:
+  static std::shared_ptr<logger_environment> create() {
+    static auto factory = std::shared_ptr<logger_environment>(new logger_environment());
+    return factory;
+  }
+
+  std::shared_ptr<logger_window> create_logger(std::string name) {
+    windows_.emplace_back(logger_window::create(std::move(name)));
+    return windows_.back();
+  }
+
+  void flush();
+
+  void draw();
+
+  void stop() {
+    //is_stop_sig_ = true;
+  }
+
+  ~logger_environment() {
+    //wthread_.get();
+  }
+protected:
+  explicit logger_environment(){
+//    wthread_ = std::async(std::launch::async, [this](){ this-> draw(); });
+  }
+
+private:
+  std::vector<std::shared_ptr<logger_window>> windows_;
 
   std::future<void> wthread_;
 
-  bool closed_ = false;
+  bool is_stop_sig_ {false};
 };
 
 template <typename DataType, typename container=std::vector<DataType>>

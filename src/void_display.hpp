@@ -14,17 +14,17 @@ std::ofstream& operator << (std::ofstream& out, vector_2d const &v);
 
 class void_display: public idisplay{
 public:
-  explicit void_display(plogger logger): logger_(std::move(logger)){
+  explicit void_display(ptext_logger logger): logger_(std::move(logger)){
   }
 
   void dump_object(vector_2d const &p, vector_2d const &v, timestamp const &t,
                    std::string const &name);
 
-  plogger & logger() { return logger_; }
+    ptext_logger & logger() { return logger_; }
 
   ~void_display() override = default;
 private:
-  plogger logger_;
+    ptext_logger logger_;
 };
 
 #endif // DSCS_VOID_DISPLAY_HPP

@@ -65,7 +65,7 @@ protected:
   size_t step_ {0};
   std::chrono::high_resolution_clock::time_point old_point_;
 
-  static std::chrono::milliseconds real_time_delta() {return 200ms; };
+  static std::chrono::milliseconds real_time_delta() {return 50ms; };
   static double delta_() { return 0.0010; };
 };
 

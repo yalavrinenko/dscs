@@ -26,22 +26,24 @@ using namespace std::chrono_literals;
 
 int main(int argc,char** argv){
   auto factory_ptr = std::make_shared<logger_factory>("../ramfs");
-  auto gui = gui::logger_factory::create("Space ship1");
+  auto gui_factory = gui::logger_environment::create();
 
-  void_map space(factory_ptr);
+  void_map space(factory_ptr, gui_factory);
 
   Random r;
   int N = 10;
-//  for (auto i = 0; i < N; ++i){
-//    auto hulk = std::make_unique<drifting_hulk>(r.uniform(1000, 10000));
-//    space.add_object(std::move(hulk),
-//        r.uniform_v(-1000, 1000),
-//        r.uniform_v(-0.01, 0.01));
-//  }
+  for (auto i = 0; i < N; ++i){
+    auto hulk = std::make_unique<drifting_hulk>(r.uniform(1000, 10000));
+    space.add_object(std::move(hulk),
+        r.uniform_v(-300, 300),
+        r.uniform_v(-10, 10));
+  }
 
-  auto small_ship = std::make_unique<small>("Ship_S", factory_ptr->create_logger("S1.ship", 1024*10));
+  auto gui_ship = gui_factory->create_logger("Ship_S");
+  auto text_log = factory_ptr->create_logger("S1.ship", 1024*10);
+  auto small_ship = std::make_unique<small>("Ship_S", plogger{text_log, gui_ship});
   small_ship->add_control_unit(std::make_unique<timed_control>());
-  space.add_object(std::move(small_ship), r.uniform_v(-1000, 1000), {0.0, 0.0});
+  space.add_object(std::move(small_ship), r.uniform_v(-300, 300), {0.0, 0.0});
 
   std::thread t([&space](){
     std::this_thread::sleep_for(1200s);

@@ -30,6 +30,17 @@ public:
                                            ComponentOptionType::make_default(scale_type::scale, out_wire, pipe),
                                            std::move(name), std::move(logger));
   }
+
+    template <typename scale_type>
+    static std::shared_ptr<ComponentType> construct(fuel_pipe const &pipe,
+                                                    wire const &out_wire,
+                                                    std::string name,
+                                                    pbattery_line apu,
+                                                    plogger logger){
+        return std::make_shared<ComponentType>(ComponentType::default_mass() * scale_type::scale,
+                                               ComponentOptionType::make_default(scale_type::scale, out_wire, pipe),
+                                               std::move(name), std::move(apu), std::move(logger));
+    }
 };
 
 using ReactorFactory = ComponentFactory<reactor, reactor_option>;
