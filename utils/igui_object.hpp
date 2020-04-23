@@ -12,15 +12,15 @@ public:
   }
 
   template <typename entry_type>
-  int add_gui_entry(entry_type e){
+  std::shared_ptr<entry_type> add_gui_entry(entry_type e){
     entries_.push_back(std::move(e));
-    return entries_.size() - 1;
+    return entry<entry_type>(entries_.size() - 1);
   }
 
   template <typename entry_type, typename ... Args>
-  int add_gui_entry(Args ... args){
+  std::shared_ptr<entry_type> add_gui_entry(Args ... args){
     entries_.push_back(window_->create_logger<entry_type>(std::forward<Args>(args)...));
-    return entries_.size() - 1;
+    return entry<entry_type>(entries_.size() - 1);
   }
 
   template <typename entry_type>

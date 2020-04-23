@@ -42,7 +42,7 @@ int main(int argc,char** argv){
   auto gui_ship = gui_factory->create_logger("Ship_S");
   auto text_log = factory_ptr->create_logger("S1.ship", 1024*10);
   auto small_ship = std::make_unique<small>("Ship_S", plogger{text_log, gui_ship});
-  small_ship->add_control_unit(std::make_unique<timed_control>());
+  //small_ship->add_control_unit(std::make_unique<timed_control>());
   space.add_object(std::move(small_ship), r.uniform_v(-300, 300), {0.0, 0.0});
 
   std::thread t([&space](){

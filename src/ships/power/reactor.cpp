@@ -2,6 +2,8 @@
 // Created by yalavrinenko on 21.08.2019.
 //
 #include "reactor.hpp"
+#include <utils/gui_input.hpp>
+#include <utility>
 
 void reactor::ignite() {
   if (state_ == reactor_state::shutdown) {
@@ -38,7 +40,7 @@ void reactor::ignite_action() {
   }
 }
 
-void reactor::log_action() const  {
+void reactor::log_action() const {
   logger()->log("Reactor [", name(), "]:");
   logger()->log("\tMass:", mass());
   logger()->log("\tState:", std::to_string(state_));
@@ -47,21 +49,23 @@ void reactor::log_action() const  {
   logger()->log("\tElectric consumption:", charge_consumption_);
 
   logger()->up_level();
-  for (auto &component: components_)
+  for (auto &component : components_)
     component->log_action();
   logger()->down_level();
 }
 
-reactor::reactor(double mass, reactor_option const &option,
+reactor::reactor(double mass, reactor_option option,
                  std::string const &name, pbattery_line apu,
-                 plogger logger) : icomponent(mass, "Reactor " + name, std::move(logger), component_type::reactor), option_(option),
-                 initial_max_output_power_{option_.peak_output},
-                 apu_{std::move(apu)}{
+                 plogger logger) : icomponent(mass, "Reactor " + name, std::move(logger), component_type::reactor), option_(std::move(option)),
+                                   initial_max_output_power_{option_.peak_output},
+                                   apu_{std::move(apu)} {
   //components_.push_back(apu_);
 
   using namespace gui;
   guis_.text = this->add_gui_entry<text_entry>(this->name());
   guis_.num = this->add_gui_entry<numeric_entry>(this->name());
+
+  register_control_action();
 }
 
 void reactor::active_action() {
@@ -94,18 +98,26 @@ void reactor::active_action() {
 }
 
 void reactor::draw() {
-  auto text = this->entry<gui::text_entry>(guis_.text);
-  auto num = this->entry<gui::numeric_entry>(guis_.num);
+  guis_.text->log("Mass:\t", std::to_string(mass()));
+  guis_.text->log("State:", std::to_string(state_));
 
-  text->log("Mass:\t", std::to_string(mass()));
-  text->log("State:", std::to_string(state_));
+  guis_.num->log("Output power:", current_power_, this->option_.peak_output);
+  guis_.num->log("Fuel consumption:", fuel_consumtion_);
+  guis_.num->log("Electric consumption:", charge_consumption_);
 
-  num->log("Output power:", current_power_, this->option_.peak_output);
-  num->log("Fuel consumption:", fuel_consumtion_);
-  num->log("Electric consumption:", charge_consumption_);
-
-  for (auto &component: components_)
+  for (auto &component : components_)
     component->draw();
+}
+void reactor::register_control_action() {
+  auto controls = this->add_gui_entry<gui::gui_controls>(this->name());
+
+  auto ignite_action = [this](gui::icontrol &obj) { this->ignite(); };
+  auto shutdown_action = [this](gui::icontrol &obj) { this->shutdown(); };
+  using button_type = gui::button_group<gui::control_callback, 2>::button_t;
+
+  auto button_group = std::make_unique<gui::button_group<gui::control_callback, 2>>(
+      std::initializer_list<button_type>{{"Ignite", ignite_action}, {"Shutdown", shutdown_action}});
+  controls->add_control(std::move(button_group));
 }
 
 reactor::~reactor() = default;

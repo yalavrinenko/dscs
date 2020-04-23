@@ -53,7 +53,11 @@ public:
   }
 
   std::vector<control_action> extract_control_actions(timestamp const &ts) override{
-    return control_unit_->control(ts, command_interface_);
+    if (control_unit_ != nullptr)
+      return control_unit_->control(ts, command_interface_);
+    else {
+      return {};
+    }
   }
 
   ~ship_hull() override = default;
@@ -69,7 +73,7 @@ protected:
 
   control_interface command_interface_;
 
-  std::unique_ptr<icontrol> control_unit_;
+  std::unique_ptr<icontrol> control_unit_ = nullptr;
 
   std::vector<pscomponent> hull_components_;
 };

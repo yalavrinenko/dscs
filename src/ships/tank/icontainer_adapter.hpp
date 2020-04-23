@@ -97,8 +97,8 @@ public:
   }
 
   void draw() override {
-    auto num = this->entry<gui::numeric_entry>(guis_.num);
-    auto plot = this->entry<gui::moving_plot_entry>(guis_.plot);
+    auto &num = guis_.num;
+    auto &plot = guis_.plot;
     num->log("Mass:", this->mass());
 
     struct {
@@ -123,7 +123,7 @@ public:
 
     num->log("Total:", info.current, info.max);
     plot->log("Flow:", info.consumption);
-    entry<gui::histo_plot_entry>(guis_.hplot)->log("Banks", selection_function);
+    guis_.hplot->log("Banks", selection_function);
   }
 
   template <class ... TArgs>
@@ -136,9 +136,9 @@ protected:
   std::vector<stored_container_ptr> inputs;
 
   struct {
-    int num;
-    int plot;
-    int hplot;
+    std::shared_ptr<gui::numeric_entry> num;
+    std::shared_ptr<gui::moving_plot_entry> plot;
+    std::shared_ptr<gui::histo_plot_entry> hplot;
   } guis_;
 private:
   double const MAX_INPUT;

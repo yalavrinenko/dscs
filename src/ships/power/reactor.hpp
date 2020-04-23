@@ -46,7 +46,7 @@ std::string to_string(reactor_state const &state);
 
 class reactor : public icomponent{
 public:
-  reactor(double mass, reactor_option const &option, std::string const &name, pbattery_line apu,
+  reactor(double mass, reactor_option option, std::string const &name, pbattery_line apu,
           plogger logger);
 
   void draw() override;
@@ -91,6 +91,8 @@ public:
 
   static constexpr double default_mass(){ return 20.0;  }
 protected:
+  void register_control_action();
+
   virtual void ignite_action();
 
   virtual void active_action();
@@ -111,8 +113,8 @@ protected:
   double const initial_max_output_power_;
 
   struct{
-    int text;
-    int num;
+    std::shared_ptr<gui::text_entry> text;
+    std::shared_ptr<gui::numeric_entry> num;
   } guis_;
 };
 

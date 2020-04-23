@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(dscs)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 file(GLOB_RECURSE SRC src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.hpp)
@@ -15,7 +15,7 @@ find_package(OpenGL)
 find_package(ImGui-SFML REQUIRED)
 find_package(X11)
 
-set(GUI_SRC utils/guilogger.cpp utils/guilogger.hpp utils/gui_entries.cpp utils/gui_entries.hpp)
+set(GUI_SRC utils/guilogger.cpp utils/guilogger.hpp utils/gui_entries.cpp utils/gui_entries.hpp utils/gui_input.cpp)
 add_library(gui SHARED ${GUI_SRC})
 include_directories(~/.local/include ${CMAKE_CURRENT_SOURCE_DIR})
 
