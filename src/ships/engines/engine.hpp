@@ -46,8 +46,13 @@ public:
 
   double mass() const override;
 
-  void align(vector_2d const &direction) {
-    target_thrust_direction_ = direction;
+  void align(double angle) {
+    auto const &ctd = current_thrust_direction_;
+    auto theta = MathExtension::dec2rad(angle);
+    auto target_x = ctd.x * std::cos(theta) + ctd.y * std::sin(theta);
+    auto target_y = -ctd.x * std::sin(theta) + ctd.y * std::cos(theta);
+
+    target_thrust_direction_ = {target_x, target_y};
     target_thrust_direction_.norm();
   }
 
@@ -64,7 +69,8 @@ public:
   double align_angle() const {
     auto cos = current_thrust_direction_.x * target_thrust_direction_.x +
                current_thrust_direction_.y * target_thrust_direction_.y;
-    return std::acos(cos) * 180.0 / M_PI;
+    auto angle = std::acos(cos) * 180.0 / MathExtension::pi();
+    return angle;
   }
 
   vector_2d const& thrust_direction() const { return current_thrust_direction_; }
@@ -78,11 +84,16 @@ public:
   }
   void draw() override;
   static constexpr double default_mass(){ return 10.0;  }
+
+  void set_max_thrust(double max_thrust) { option_.max_thrust = max_thrust; }
 protected:
+  void register_control_action();
+
   virtual void align_engine();
 
   engine_option option_;
 
+  double thrust_peak_limit_ = option_.max_thrust;
   double current_thrust_{0};
   engine_state current_state_ = engine_state::disable;
 

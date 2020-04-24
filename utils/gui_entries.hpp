@@ -132,13 +132,17 @@ public:
     data_.tmp().emplace_back(point);
   }
 
+  void change_range(double max_r, size_t segments) {
+    max_r_ = max_r; segments_ = segments;
+  }
+
   void flush() override { data_.swap(); }
 
 protected:
   void draw_impl() override;
 
   cloned_data<radar_point> data_;
-  double const max_r_;
+  double max_r_;
   size_t segments_{1};
 };
 } // namespace gui

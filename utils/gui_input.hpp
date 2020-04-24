@@ -11,10 +11,14 @@ namespace gui {
 
   class icontrol {
   public:
+    using callback_t = std::function<void(icontrol &)>;
+    using setter_t = callback_t;
+
+    template<typename return_type>
+    using getter_t = std::function<return_type(icontrol &)>;
+
     virtual void draw() = 0;
   };
-
-  using control_callback = std::function<void(icontrol &)>;
 
   class gui_controls : public ilogger_entry {
   public:
@@ -26,7 +30,7 @@ namespace gui {
     }
 
     template<typename control_type>
-    void add_control(std::unique_ptr<control_type> &&controls){
+    void add_control(std::unique_ptr<control_type> &&controls) {
       controls_.emplace_back(std::move(controls));
     }
 
@@ -38,37 +42,82 @@ namespace gui {
     std::vector<std::unique_ptr<icontrol>> controls_;
   };
 
-  template<typename callback_type>
   class button_control : public icontrol {
   public:
-    using callback_t = callback_type;
-
     button_control() = default;
 
-    button_control(std::string text, callback_t callback) : button_text_{std::move(text)},
-                                                            callback_{std::move(callback)} {}
+    button_control(std::string text, callback_t callback)
+        : button_text_{std::move(text)}, callback_{std::move(callback)} {}
 
     void draw() override {
-      if (!button_text_.empty() && ImGui::Button(button_text_.c_str())) {
-        callback_(*this);
-      }
+      if (!button_text_.empty() && ImGui::Button(button_text_.c_str())) { callback_(*this); }
     }
 
   protected:
-    callback_type callback_;
+    callback_t callback_;
     std::string button_text_;
   };
 
-  template<typename callback_type, std::size_t N>
+  template<typename value_type>
+  class value_setter {
+  public:
+    using value_t = value_type;
+
+    value_setter(icontrol::setter_t getter, icontrol::getter_t<value_t> setter) : value_setter_{getter}, value_getter_{setter} {}
+
+    value_t const &value() const { return value_; }
+    value_t value() { return value_getter_; }
+
+  protected:
+    value_t value_;
+    icontrol::getter_t<value_t> value_getter_;
+    icontrol::setter_t value_setter_;
+  };
+
+  class slider_control : public icontrol, public value_setter<float> {
+  public:
+    slider_control(std::string text, callback_t callback, getter_t<double> setter = nullptr,
+                   std::pair<double, double> range = {-360, 360})
+        : text_{std::move(text)}, range_{std::move(range)}, value_setter<float>(std::move(callback), std::move(setter)) {
+    }
+    void draw() override;
+  protected:
+    std::string text_;
+    std::pair<double, double> range_;
+  };
+
+  class angle_control : public slider_control {
+  public:
+    angle_control(std::string text, callback_t callback, getter_t<double> setter = nullptr,
+                  std::pair<double, double> range = {-360, 360})
+        : slider_control(std::move(text), std::move(callback), std::move(setter), std::move(range)) {}
+
+    void draw() override;
+
+    [[nodiscard]] double angle() const { return this->value(); }
+
+  protected:
+  };
+
+  class int_entry_control : public icontrol, public value_setter<int> {
+  public:
+    int_entry_control(std::string text, icontrol::setter_t getter, icontrol::getter_t<int> setter,
+                      int min_value = 1);
+    void draw() override;
+
+  protected:
+    std::string text_;
+    int min_;
+  };
+
+  template<typename button_type, std::size_t N>
   class button_group : public icontrol {
   public:
-    using button_t = button_control<callback_type>;
+    using button_t = button_type;
 
     button_group(std::initializer_list<button_t> &&list) {
       auto i = 0;
-      for (auto &&e : list){
-          buttons_[i++] = std::move(e);
-      }
+      for (auto &&e : list) { buttons_[i++] = std::move(e); }
     }
     void draw() override {
       ImGui::Columns(N, nullptr, false);
@@ -80,7 +129,7 @@ namespace gui {
     }
 
   protected:
-    std::array<button_control<callback_type>, N> buttons_;
+    std::array<button_control, N> buttons_;
   };
 }// namespace gui
 

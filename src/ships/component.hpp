@@ -6,6 +6,7 @@
 #define DSCS_COMPONENT_HPP
 #include "../../utils/logger_factory.hpp"
 #include <memory>
+#include "utils/math_function.hpp"
 
 enum class component_type{
   engine,
@@ -15,6 +16,7 @@ enum class component_type{
   battery,
   radar,
   radio,
+  monitor_unit,
   none
 };
 

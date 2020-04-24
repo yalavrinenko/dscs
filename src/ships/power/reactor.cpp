@@ -113,10 +113,9 @@ void reactor::register_control_action() {
 
   auto ignite_action = [this](gui::icontrol &obj) { this->ignite(); };
   auto shutdown_action = [this](gui::icontrol &obj) { this->shutdown(); };
-  using button_type = gui::button_group<gui::control_callback, 2>::button_t;
 
-  auto button_group = std::make_unique<gui::button_group<gui::control_callback, 2>>(
-      std::initializer_list<button_type>{{"Ignite", ignite_action}, {"Shutdown", shutdown_action}});
+  auto button_group = std::make_unique<gui::button_group<gui::button_control, 2>>(
+      std::initializer_list<gui::button_control>{{"Ignite", ignite_action}, {"Shutdown", shutdown_action}});
   controls->add_control(std::move(button_group));
 }
 

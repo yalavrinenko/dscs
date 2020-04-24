@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(dscs)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fconcepts")
 
 file(GLOB_RECURSE SRC src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.hpp)
@@ -39,7 +40,7 @@ target_link_libraries(logger stdc++fs)
 
 add_subdirectory(tests)
 
-add_library(dscs-lib ${SRC} ${HEADERS})
+add_library(dscs-lib ${SRC} ${HEADERS} src/ships/control/command_unit.cpp src/ships/control/command_unit.hpp)
 add_executable(dscs entry.cpp)
 
 target_link_libraries(dscs stdc++fs pthread gui dscs-lib logger)

@@ -11,7 +11,7 @@ radio_control_unit::control(timestamp const &ts, control_interface &ship) {
   }
 
   if (ts == t + 20){
-    auto rotate = [](pengine &engine){ engine->align({0.5, 0.5}); };
+    auto rotate = [](pengine &engine){ engine->align(45.0); };
     engines.apply(rotate);
   }
 

@@ -4,6 +4,8 @@
 
 #include "small.hpp"
 #include "../component-factrory.hpp"
+#include <src/ships/control/command_unit.hpp>
+
 small::small(std::string name, plogger logger):
   ship_hull(1e+6, std::move(name), std::move(logger)){
 
@@ -13,11 +15,15 @@ small::small(std::string name, plogger logger):
   wire radar_wire(power_system_.main_battery_);
   radio_transmitter_option r_option{radar_wire};
 
-  radar_ = std::make_unique<radar>(
+  radar_ = std::make_shared<radar>(
       radio_unit_config<component_size::medium>::mass, 5, r_option, this->env_.EM_Field(), "Main Radar",
       this->slogger());
 
+  auto ucontrol = std::make_shared<command_unit>(1.0, "Main control unit", this->slogger(), component_type::monitor_unit);
+  ucontrol->register_long_range_radar(radar_);
+
   add_component(radar_, true);
+  add_component(ucontrol, false);
 }
 
 void small::construct_power_system() {
