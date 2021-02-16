@@ -57,8 +57,7 @@ protected:
 class logger_entry{
 public:
   explicit logger_entry(std::filesystem::path path, logger_factory* factory):
-    factory_{factory},
-    linked_path_(std::move(path)){}
+    linked_path_(std::move(path)), factory_{factory}{}
 
   template <class ... TArgs>
   void log(TArgs ... args){

@@ -17,6 +17,7 @@ enum class component_type{
   radar,
   radio,
   monitor_unit,
+  warhead,
   none
 };
 
@@ -56,9 +57,9 @@ protected:
 
 private:
   mutable ptext_logger logger_ = nullptr;
-  plogger loggers_;
   std::string name_;
   component_type type_;
+  plogger loggers_;
 };
 
 using pcomponent = std::unique_ptr<icomponent>;

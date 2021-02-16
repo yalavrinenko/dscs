@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(dscs)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fconcepts")
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fconcepts -Wall -Werror -Wno-sign-compare") #Fuck imgui
 
 file(GLOB_RECURSE SRC src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.hpp)
@@ -18,7 +18,9 @@ find_package(X11)
 
 set(GUI_SRC utils/guilogger.cpp utils/guilogger.hpp utils/gui_entries.cpp utils/gui_entries.hpp utils/gui_input.cpp)
 add_library(gui SHARED ${GUI_SRC})
-include_directories(~/.local/include ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(~/Files/apis/SFML/build/include ~/Files/apis/imgui-sfml/build/include
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 include(FetchContent)
 FetchContent_Declare(
@@ -40,7 +42,7 @@ target_link_libraries(logger stdc++fs)
 
 add_subdirectory(tests)
 
-add_library(dscs-lib ${SRC} ${HEADERS} src/ships/control/command_unit.cpp src/ships/control/command_unit.hpp)
+add_library(dscs-lib ${SRC} ${HEADERS} src/ships/control/command_unit.cpp src/ships/control/command_unit.hpp src/ships/weapons/warhead.cpp src/ships/weapons/warhead.hpp)
 add_executable(dscs entry.cpp)
 
 target_link_libraries(dscs stdc++fs pthread gui dscs-lib logger)

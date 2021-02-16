@@ -16,7 +16,7 @@
 class communication_data{
 public:
   explicit communication_data(std::string data,
-      double frequency, double power): freq_(frequency), data_{std::move(data)}, power_{power} {}
+      double frequency, double power): data_{std::move(data)}, freq_(frequency), power_{power} {}
 
   [[nodiscard]] std::string const& data() const { return data_; }
 

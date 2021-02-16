@@ -57,8 +57,7 @@ void reactor::log_action() const {
 reactor::reactor(double mass, reactor_option option,
                  std::string const &name, pbattery_line apu,
                  plogger logger) : icomponent(mass, "Reactor " + name, std::move(logger), component_type::reactor), option_(std::move(option)),
-                                   initial_max_output_power_{option_.peak_output},
-                                   apu_{std::move(apu)} {
+                                   apu_{std::move(apu)}, initial_max_output_power_{option_.peak_output} {
   //components_.push_back(apu_);
 
   using namespace gui;

@@ -18,6 +18,9 @@ public:
 
   void draw() override {
     entry<gui::numeric_entry>()->log("Mass:", this->mass());
+    auto acceleration = this->force(timestamp());
+    entry<gui::numeric_entry>()->log("Acceleration X:", acceleration.x / this->mass());
+    entry<gui::numeric_entry>()->log("Acceleration Y:", acceleration.y / this->mass());
     for (auto &c : hull_components_)
       c->draw();
   }

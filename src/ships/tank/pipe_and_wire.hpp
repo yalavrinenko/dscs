@@ -11,7 +11,7 @@ template<class adapter_type>
 class ipipe{
 public:
   ipipe(std::shared_ptr<adapter_type> linked_line, pbattery_line electric_supply, double charge_consumption):
-    charge_consumption_(charge_consumption), linked_line_(std::move(linked_line)),
+      linked_line_(std::move(linked_line)), charge_consumption_(charge_consumption),
     electric_supply_line_(std::move(electric_supply)){
   }
 

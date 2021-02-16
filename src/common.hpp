@@ -19,7 +19,7 @@ public:
   timestamp(): old_point_(std::chrono::high_resolution_clock::now()){
   }
 
-  explicit timestamp(size_t step): step_(step), time_(step * delta_()),
+  explicit timestamp(size_t step): time_(step * delta_()), step_(step),
     old_point_(std::chrono::high_resolution_clock::now()){
   }
 
@@ -27,7 +27,7 @@ public:
     return time_;
   }
 
-  [[nodiscard]] double delta() const {
+  [[nodiscard]] static double delta() {
     return delta_();
   }
 
@@ -74,7 +74,7 @@ struct vector_2d{
 
   vector_2d(double x, double y): x(x), y(y) {}
 
-  vector_2d operator+ (vector_2d const &v){
+  vector_2d operator+ (vector_2d const &v) const{
     return {this->x + v.x, this->y + v.y};
   }
 
@@ -87,15 +87,15 @@ struct vector_2d{
     return *this;
   }
 
-  vector_2d operator* (double v){
+  vector_2d operator* (double v) const{
     return {this->x * v, this->y * v};
   }
 
-  vector_2d operator*(vector_2d const &v){
+  vector_2d operator*(vector_2d const &v) const{
     return {this->x * v.x, this->y * v.y};
   }
 
-  vector_2d operator/ (double v){
+  vector_2d operator/ (double v) const{
     return *this * (1.0 / v);
   }
 
@@ -105,7 +105,7 @@ struct vector_2d{
     y /= l;
   }
 
-  double len() const{
+  [[nodiscard]] double len() const{
     return std::sqrt(x*x + y*y);
   }
 

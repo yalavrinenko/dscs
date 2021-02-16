@@ -24,9 +24,9 @@ struct radio_transmitter_option{
 class radio_unit : public icomponent{
 public:
   radio_unit(double mass, radio_transmitter_option option, em_field &field):
+      icomponent(mass, "radio", {nullptr, nullptr}, component_type::radio),
       option_{std::move(option)},
-      transmission_field_{field},
-      icomponent(mass, "radio", {nullptr, nullptr}, component_type::radio){
+      transmission_field_{field}{
     signal_receiver_ = std::make_shared<radio_receiver>(received_packages);
     transmission_field_.register_receiver(signal_receiver_, option.frequency);
   }

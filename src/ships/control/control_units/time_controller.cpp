@@ -12,7 +12,7 @@ std::vector<control_action> timed_control::control(timestamp const &ts,
   if (!reactors.ready2use || !engines.ready2use)
     construct_component_groups(ship);
 
-  auto ignite = [](preactor &reactor){
+  [[maybe_unused]] auto ignite = [](preactor &reactor){
     reactor->ignite();
   };
 
