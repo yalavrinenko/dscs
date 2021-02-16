@@ -19,8 +19,11 @@ public:
 
   template <typename entry_type, typename ... Args>
   std::shared_ptr<entry_type> add_gui_entry(Args ... args){
-    entries_.push_back(window_->create_logger<entry_type>(std::forward<Args>(args)...));
-    return entry<entry_type>(entries_.size() - 1);
+    if (window_) {
+      entries_.push_back(window_->create_logger<entry_type>(std::forward<Args>(args)...));
+      return entry<entry_type>(entries_.size() - 1);
+    } else
+      return nullptr;
   }
 
   template <typename entry_type>

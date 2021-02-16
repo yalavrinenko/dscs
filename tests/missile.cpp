@@ -47,7 +47,7 @@ TEST(missile, real_space){
                      r.uniform_v(-0.01, 0.01));
   }
 
-  auto m_1 = std::make_unique<missile>(412.0, 1, "Missile_1", factory_ptr->create_logger("Missile_1.missile"));
+  auto m_1 = std::make_unique<missile>(412.0, 1, "Missile_1", factory_ptr->create_logger("Missile_1.missiles"));
 
   auto tank = resource_line_factory<fuel_tank_line>::construct_line(1, 100, 100, "", nullptr, 4, 5000, 1, 1);
   while (tank->push(100));
@@ -83,7 +83,7 @@ TEST(missile, create){
 
   void_map space(factory_ptr);
 
-  auto m_1 = std::make_unique<missile>(412.0, 1, "Missile_1", factory_ptr->create_logger("Missile_1.missile"));
+  auto m_1 = std::make_unique<missile>(412.0, 1, "Missile_1", factory_ptr->create_logger("Missile_1.missiles"));
 
   auto tank = resource_line_factory<fuel_tank_line>::construct_line(1, 100, 100, "", nullptr, 4, 5000, 1, 1);
   while (tank->push(100));

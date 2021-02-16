@@ -56,7 +56,8 @@ engine::engine(double mass, engine_option const &option,
   add_gui_entry<gui::moving_plot_entry>(this->name(), 100);
   add_gui_entry<gui::polar_entry>(this->name(), 1.0);
 
-  register_control_action();
+  if (this->slogger().gui_window != nullptr)
+    register_control_action();
 }
 
 void engine::align_engine() {

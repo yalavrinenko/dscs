@@ -1,17 +1,20 @@
 //
-// Created by yalavrinenko on 06.11.2019.
+// Created by yalavrinenko on 16.02.2021.
 //
 
-#ifndef DSCS_CONTROLLED_MISSILE_HPP
-#define DSCS_CONTROLLED_MISSILE_HPP
+#ifndef DSCS_MISSILE_HPP
+#define DSCS_MISSILE_HPP
+
 
 #include "../../hull.hpp"
 #include "../controls/remote_control.hpp"
 #include "../../engines/engine.hpp"
 
+class warhead;
+
 class missile: public ship_hull{
 public:
-  missile(double comm_freq, size_t uid, std::string name, plogger logger);
+  missile(std::string name, plogger logger);
 
   bool charge(wire &source);
 
@@ -19,15 +22,17 @@ public:
 
   vector_2d force(timestamp const &time) override;
 
-  double mass() const override;
+  void setup_warhead(std::shared_ptr<warhead> warhead);
+
+  virtual void arm() = 0;
 
 private:
-
-  std::shared_ptr<radio_unit> radio_;
   std::shared_ptr<engine> engine_;
+  std::shared_ptr<warhead> warhead_;
+
   pbattery_line battery_;
   pfuel_tank_line fuel_;
-
-  size_t uid{};
 };
-#endif // DSCS_CONTROLLED_MISSILE_HPP
+
+
+#endif//DSCS_MISSILE_HPP

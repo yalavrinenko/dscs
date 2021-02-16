@@ -8,6 +8,7 @@
 #include <future>
 #include <random>
 #include <ships/weapons/warhead.hpp>
+#include <ships/weapons/missiles/NAR_M.hpp>
 
 class Random{
 public:
@@ -47,7 +48,10 @@ int main(int argc,char** argv){
   auto small_ship = std::make_unique<small>("Ship_S", plogger{text_log, gui_ship});
   //small_ship->add_control_unit(std::make_unique<timed_control>());
 
+  auto nar = std::make_unique<NAR_M>(0.1, 20.0, "NAR-1", plogger{factory_ptr->create_logger("NAR.missile", 1024*10), nullptr});
+
   space.add_object(std::move(small_ship), r.uniform_v(-300, 300), {0.0, 0.0});
+  space.add_object(std::move(nar), r.uniform_v(-300, 300), {0.0, 0.0});
 
   std::thread t([&space](){
     std::this_thread::sleep_for(1200s);

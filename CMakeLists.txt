@@ -42,7 +42,7 @@ target_link_libraries(logger stdc++fs)
 
 add_subdirectory(tests)
 
-add_library(dscs-lib ${SRC} ${HEADERS})
+add_library(dscs-lib ${SRC} ${HEADERS} src/ships/weapons/missiles/missile.cpp src/ships/weapons/missiles/missile.hpp src/ships/weapons/missiles/NAR_M.cpp src/ships/weapons/missiles/NAR_M.hpp)
 add_executable(dscs entry.cpp)
 
 target_link_libraries(dscs stdc++fs pthread gui dscs-lib logger)

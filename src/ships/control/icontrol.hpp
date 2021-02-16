@@ -14,6 +14,7 @@
 #include "../tank/fuel_adapter.hpp"
 #include "../tank/battery_adapter.hpp"
 #include "../detection/communications.hpp"
+#include <ships/weapons/warhead.hpp>
 
 class control_interface{
 public:
@@ -51,10 +52,13 @@ protected:
         engines.devices.emplace_back(ship.find_interface<engine>(name));
       if (comp->type() == component_type::reactor)
         reactors.devices.emplace_back(ship.find_interface<reactor>(name));
+      if (comp->type() == component_type::warhead)
+        payloads.devices.emplace_back(ship.find_interface<warhead>(name));
     }
 
     engines.ready2use = true;
     reactors.ready2use = true;
+    payloads.ready2use = true;
   }
 
   template <typename component_type>
@@ -78,6 +82,7 @@ protected:
 
   component_group<pengine> engines;
   component_group<preactor> reactors;
+  component_group<std::shared_ptr<warhead>> payloads;
 };
 
 #endif // DSCS_ICONTROL_HPP

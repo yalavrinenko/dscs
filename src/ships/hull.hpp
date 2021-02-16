@@ -17,6 +17,8 @@ public:
   }
 
   void draw() override {
+    if (slogger().gui_window == nullptr) return;
+
     entry<gui::numeric_entry>()->log("Mass:", this->mass());
     auto acceleration = this->force(timestamp());
     entry<gui::numeric_entry>()->log("Acceleration X:", acceleration.x / this->mass());
