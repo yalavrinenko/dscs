@@ -7,6 +7,7 @@
 #include "src/void_map.hpp"
 #include <future>
 #include <random>
+#include <ships/weapons/warhead.hpp>
 
 class Random{
 public:
@@ -32,8 +33,10 @@ int main(int argc,char** argv){
 
   Random r;
   int N = 10;
+
   for (auto i = 0; i < N; ++i){
     auto hulk = std::make_unique<drifting_hulk>(r.uniform(1000, 10000));
+
     space.add_object(std::move(hulk),
         r.uniform_v(-300, 300),
         r.uniform_v(-10, 10));
@@ -43,10 +46,12 @@ int main(int argc,char** argv){
   auto text_log = factory_ptr->create_logger("S1.ship", 1024*10);
   auto small_ship = std::make_unique<small>("Ship_S", plogger{text_log, gui_ship});
   //small_ship->add_control_unit(std::make_unique<timed_control>());
+
   space.add_object(std::move(small_ship), r.uniform_v(-300, 300), {0.0, 0.0});
 
   std::thread t([&space](){
     std::this_thread::sleep_for(1200s);
+    std::this_thread::sleep_for(30s);
     space.stop();
   });
 

@@ -109,8 +109,8 @@ using ptext_logger = std::shared_ptr<logger_entry>;
 using pgui_logger = std::shared_ptr<gui::logger_window>;
 
 struct plogger{
-  ptext_logger text_logger;
-  pgui_logger gui_window;
+  ptext_logger text_logger = {};
+  pgui_logger gui_window = {};
 };
 
 #endif // DSCS_LOGGER_FACTORY_HPP

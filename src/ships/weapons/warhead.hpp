@@ -8,17 +8,21 @@
 #include <void_object.hpp>
 #include <functional>
 
-using explode_callback = std::function<void(void_object const* carrier_object_, double explosion_radius)>;
-
 class warhead: public icomponent {
 public:
-  warhead(double mass, std::string name, auto const* carrier): icomponent(mass, std::move(name), nullptr, component_type::warhead),
-                                                      carrier_object_{carrier}, explosion_radius_{mass_to_explosion_r(mass)}{
-  }
+  using explode_callback = std::function<void(void_object const* carrier_object_, double explosion_radius)>;
+
+  warhead(double mass, std::string name, auto const *carrier, warhead::explode_callback explode)
+      : icomponent(mass, std::move(name), plogger(), component_type::warhead),
+        call_explosion_(std::move(explode)),
+        carrier_object_{carrier}, explosion_radius_{mass_to_explosion_r(mass)} {}
+
   void action() override;
   void log_action() const override;
   double mass() const override;
   void draw() override;
+
+  void explode();
 
 private:
 
@@ -26,6 +30,7 @@ private:
       return mass * 0.001;
   }
 
+  explode_callback call_explosion_ = nullptr;
   void_object const* carrier_object_ = nullptr;
   double explosion_radius_ = {0};
 };

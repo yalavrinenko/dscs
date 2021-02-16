@@ -26,6 +26,8 @@ void void_map::update() {
   }
 
   while (actions_.invoke_next(time));
+
+  remove_queued_objects();
 }
 
 void void_map::integrate() {
@@ -107,4 +109,26 @@ std::vector<control_action> void_map::signal_propagate_action(field_package comm
   }
 
   return signal_transmission_action;
+}
+
+std::function<void(void_object const*, double)> void_map::remove_object_callback() {
+  return [this](void_object const* main_object, double r){
+    auto position = find_object(main_object).position;
+    std::for_each(objects.begin(), objects.end(), [this, position, r](void_object_description const& obj){
+      if ((position - obj.position).len() <= r)
+        remove_object_queue_.insert(obj.object.get());
+    });
+  };
+}
+
+void void_map::remove_queued_objects() {
+  if (remove_object_queue_.empty()) return;
+
+  auto remove_it = std::remove_if(objects.begin(), objects.end(), [this](void_object_description const&obj){
+    return remove_object_queue_.count(obj.object.get());
+  });
+
+  objects.erase(remove_it, objects.end());
+
+  remove_object_queue_.clear();
 }

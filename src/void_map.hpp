@@ -12,6 +12,7 @@
 #include "ships/control/actions.hpp"
 #include "env_interaction.hpp"
 #include "utils/guilogger.hpp"
+#include <unordered_set>
 
 class void_map: std::enable_shared_from_this<void_map> {
 public:
@@ -23,6 +24,8 @@ public:
 
   virtual void add_object(pvoid_object &&object, vector_2d const &position,
                           vector_2d const &velocity);
+
+  virtual std::function<void(void_object const*, double)> remove_object_callback();
 
   virtual void update();
 
@@ -36,7 +39,9 @@ public:
     exit_ = true;
   }
 
-//protected:
+protected:
+  void remove_queued_objects();
+
   void update_objects();
 
   void integrate();
@@ -63,6 +68,8 @@ public:
   std::vector<void_object_description> objects;
   action_queue actions_;
   timestamp time;
+
+  std::unordered_set<void_object const*> remove_object_queue_;
 
   mutable std::unique_ptr<void_display> display;
   std::shared_ptr<logger_factory> logger_factory_;

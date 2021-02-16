@@ -42,7 +42,7 @@ target_link_libraries(logger stdc++fs)
 
 add_subdirectory(tests)
 
-add_library(dscs-lib ${SRC} ${HEADERS} src/ships/control/command_unit.cpp src/ships/control/command_unit.hpp src/ships/weapons/warhead.cpp src/ships/weapons/warhead.hpp)
+add_library(dscs-lib ${SRC} ${HEADERS})
 add_executable(dscs entry.cpp)
 
 target_link_libraries(dscs stdc++fs pthread gui dscs-lib logger)
