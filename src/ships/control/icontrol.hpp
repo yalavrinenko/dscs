@@ -37,6 +37,25 @@ protected:
 
 class icontrol{
 public:
+  template <typename component_type>
+  struct component_group{
+    std::vector<component_type> devices;
+
+    template <typename function_type>
+    void apply(function_type funcion){
+      std::for_each(devices.begin(), devices.end(), funcion);
+    }
+
+    template <typename transform_function, typename transform_value>
+    std::vector<transform_value> request(transform_function func){
+      std::vector<transform_value> v(devices.size());
+      std::transform(devices.begin(), devices.end(), v.begin(), func);
+      return v;
+    }
+
+    bool ready2use = false;
+  };
+
   icontrol() = default;
 
   explicit icontrol(control_interface &ship) {
@@ -60,25 +79,6 @@ protected:
     reactors.ready2use = true;
     payloads.ready2use = true;
   }
-
-  template <typename component_type>
-  struct component_group{
-    std::vector<component_type> devices;
-
-    template <typename function_type>
-    void apply(function_type funcion){
-      std::for_each(devices.begin(), devices.end(), funcion);
-    }
-
-    template <typename transform_function, typename transform_value>
-    std::vector<transform_value> request(transform_function func){
-      std::vector<transform_value> v(devices.size());
-      std::transform(devices.begin(), devices.end(), v.begin(), func);
-      return v;
-    }
-
-    bool ready2use = false;
-  };
 
   component_group<pengine> engines;
   component_group<preactor> reactors;

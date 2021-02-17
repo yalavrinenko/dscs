@@ -142,7 +142,7 @@ void engine::register_control_action() {
   auto thurst_setter_ = [this](auto &obj) { return this->option_.max_thrust / thrust_peak_limit_ * 100.0; };
   auto change_thrust = [this](auto &obj){
     auto const& slider = dynamic_cast<gui::slider_control const &>(obj);
-    this->set_max_thrust(slider.value() * thrust_peak_limit_ / 100.0);
+    this->set_max_thrust(slider.value() / 100.0);
   };
   controls->add_control<gui::slider_control>("Max thrust", change_thrust, thurst_setter_, std::make_pair(10, 100));
 }

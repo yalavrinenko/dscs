@@ -119,5 +119,6 @@ protected:
 };
 
 using preactor = std::shared_ptr<reactor>;
+using wreactor = std::weak_ptr<reactor>;
 
 #endif // DSCS_REACTOR_HPP

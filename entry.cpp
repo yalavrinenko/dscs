@@ -48,12 +48,34 @@ int main(int argc,char** argv){
   auto small_ship = std::make_unique<small>("Ship_S", plogger{text_log, gui_ship});
   //small_ship->add_control_unit(std::make_unique<timed_control>());
 
-  auto nar = std::make_unique<NAR_M>(0.1, 20.0, "NAR-1", plogger{factory_ptr->create_logger("NAR.missile", 1024*10), nullptr});
+  auto nar = std::make_unique<NAR_M>(0.02, 20.0, "NAR-1", plogger{factory_ptr->create_logger("NAR.missile", 1024*10), nullptr});
 
-  space.add_object(std::move(small_ship), r.uniform_v(-300, 300), {0.0, 0.0});
-  space.add_object(std::move(nar), r.uniform_v(-300, 300), {0.0, 0.0});
+  auto tank = resource_line_factory<fuel_tank_line>::construct_line(1, 100, 100, "", plogger{}, 4, 5000, 1, 1);
+  while (tank->push(100));
 
-  std::thread t([&space](){
+  auto battery = resource_line_factory<battery_line>::construct_line(1, 50, 50, "", plogger{}, 4, 5000, 1);
+  while (battery->push(100));
+
+  fuel_pipe p(tank, battery, 0.01);
+  wire w(battery);
+
+  bool is_charged = false, is_refueled = false;
+  while (!is_charged || !is_refueled){
+    if (!is_charged)
+      is_charged = nar->charge(w);
+    if (!is_refueled)
+      is_refueled = nar->refule(p);
+  }
+
+
+  space.add_object(std::move(small_ship), {0, 0}, {0.0, 0.0});
+
+  std::thread t([&space, &nar, &r](){
+    std::this_thread::sleep_for(20s);
+
+    nar->arm();
+    space.add_object(std::move(nar), {0, 0}, {5.0, 0.0});
+
     std::this_thread::sleep_for(1200s);
     std::this_thread::sleep_for(30s);
     space.stop();

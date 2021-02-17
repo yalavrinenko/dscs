@@ -9,5 +9,24 @@ std::vector<control_action> timed_control::control(timestamp const &ts,
   if (!reactors.ready2use || !engines.ready2use || !payloads.ready2use)
     construct_component_groups(ship);
 
-  return {};
+  if (begin_ == timestamp{})
+    begin_ = ts;
+
+  std::vector<control_action> actions{};
+
+  while (!queue_.empty() && queue_.top().first == ts - begin_){
+    auto action = queue_.top().second;
+
+    auto act_func = [this, action](timestamp const& ts) {
+      action(engines, reactors, payloads);
+    };
+    actions.emplace_back(act_func, ts);
+
+    queue_.pop();
+  }
+
+  return actions;
+}
+void timed_control::add_action(timestamp ts, timed_control::action_function action) {
+  queue_.emplace(ts, std::move(action));
 }

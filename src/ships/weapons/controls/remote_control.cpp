@@ -11,13 +11,13 @@ radio_control_unit::control(timestamp const &ts, control_interface &ship) {
   }
 
   if (ts == t + 20){
-    auto rotate = [](pengine &engine){ engine->align(45.0); };
-    engines.apply(rotate);
+ //   auto rotate = [](pengine &engine){ engine->align(45.0); };
+//    engines.apply(rotate);
   }
 
   if (ts == t + 50){
-    auto ignite = [](pengine &engine) { engine->ignite(); };
-    engines.apply(ignite);
+//    auto ignite = [](pengine &engine) { engine->ignite(); };
+//    engines.apply(ignite);
   }
   return {};
 }

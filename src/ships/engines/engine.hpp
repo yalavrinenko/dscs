@@ -85,7 +85,9 @@ public:
   void draw() override;
   static constexpr double default_mass(){ return 10.0;  }
 
-  void set_max_thrust(double max_thrust) { option_.max_thrust = max_thrust; }
+  void set_max_thrust(double max_thrust_fraction) {
+    option_.max_thrust = thrust_peak_limit_ * max_thrust_fraction;
+  }
 protected:
   void register_control_action();
 
@@ -106,4 +108,5 @@ private:
 };
 
 using pengine = std::shared_ptr<engine>;
+using wengine = std::weak_ptr<engine>;
 #endif // DSCS_ENGINE_HPP

@@ -49,6 +49,10 @@ public:
     return new_ts;
   }
 
+  timestamp operator- (timestamp const& rhs) const {
+    return timestamp(step_ - rhs.step_);
+  }
+
   bool operator < (timestamp const &ts) const { return this->step() < ts.step();  }
 
   bool operator == (timestamp const &ts) const { return this->step() == ts.step(); }

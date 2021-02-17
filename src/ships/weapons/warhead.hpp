@@ -35,5 +35,7 @@ private:
   double explosion_radius_ = {0};
 };
 
+using pwarhead = std::shared_ptr<warhead>;
+
 
 #endif//DSCS_WARHEAD_HPP
