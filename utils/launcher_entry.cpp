@@ -71,7 +71,8 @@ void gui::launcher_entry::draw_impl() {
 
         ImGui::NextColumn();
         if (!m.warhead) {
-          if (ImGui::Button("ARM")) callbacks_.on_arm(m.callback_index);
+          if (ImGui::Button("ARM"))
+            callbacks_.on_arm(m.callback_index);
         } else {
           if (ImGui::Button("DISARM")) callbacks_.on_disarm(m.callback_index);
         }

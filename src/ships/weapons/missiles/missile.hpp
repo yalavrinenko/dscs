@@ -25,7 +25,7 @@ public:
 
   vector_2d force(timestamp const &time) override;
 
-  void setup_warhead(std::shared_ptr<warhead> warhead);
+  void setup_warhead(std::unique_ptr<warhead> warhead);
 
   virtual void arm() = 0;
 

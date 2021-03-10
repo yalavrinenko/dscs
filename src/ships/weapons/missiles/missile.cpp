@@ -17,7 +17,7 @@ bool missile::refule(fuel_pipe &source) {
   auto pushed = fuel_->push(get);
   source.push(get - pushed);
 
-  return pushed == 0;
+  return pushed == 0 && get != 0;
 }
 
 bool missile::charge(wire &source) {
@@ -26,10 +26,10 @@ bool missile::charge(wire &source) {
   auto pushed = battery_->push(charge);
   source.push(charge - pushed);
 
-  return pushed == 0;
+  return pushed == 0 && charge != 0;
 }
 
-void missile::setup_warhead(std::shared_ptr<warhead> warhead) {
+void missile::setup_warhead(std::unique_ptr<warhead> warhead) {
   if (warhead_ != nullptr)
     throw std::logic_error("Double warhead not supported");
 
