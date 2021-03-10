@@ -7,6 +7,7 @@
 
 #include <component-factrory.hpp>
 #include <ships/component.hpp>
+#include <ships/weapons/missiles/missile.hpp>
 
 class base_cargo;
 
@@ -19,22 +20,38 @@ public:
   void log_action() const override;
   void draw() override;
 
+  void connect_cargo(std::shared_ptr<base_cargo> cargo);
+
   ~launcher() override;
 protected:
-  std::unique_ptr<base_cargo> cargo_;
+  std::shared_ptr<base_cargo> cargo_;
   wire power_;
   fuel_pipe fuel_;
-  size_t launch_pads_;
 
-  enum state{
-    idle,
-    refuel,
-    charge,
-    redy_to_fire
-  };
+  size_t active_pads_{0};
+  size_t launch_pads_;
 
   double power_consumption_{};
   double fuel_consumption_{};
+
+  enum missile_action{
+    idle,
+    refuel,
+    charge,
+    fire
+  };
+
+  struct missile_info{
+    std::unique_ptr<missile> missile_ptr;
+    bool is_armed{false};
+    bool is_locked{false};
+    bool is_ready2fire{false};
+
+    std::atomic<missile_action> next_action;
+  };
+
+  std::vector<missile_info> loaded_;
+
 };
 
 

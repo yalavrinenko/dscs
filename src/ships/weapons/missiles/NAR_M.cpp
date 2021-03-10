@@ -4,9 +4,15 @@
 
 #include "NAR_M.hpp"
 #include <ships/control/control_units/time_controller.hpp>
-NAR_M::NAR_M(double ignite_at, double explode_at, std::string name, plogger logger)
+NAR_M::NAR_M(std::string name, plogger logger)
     : missile(std::move(name), std::move(logger)), controller_{std::make_unique<timed_control>()} {
+}
 
+void NAR_M::arm() {
+  this->add_control_unit(std::move(controller_));
+}
+
+void NAR_M::set_flight_parameter(double ignite_at, double explode_at) {
   auto ignite_ts = timestamp(ignite_at / timestamp::delta());
   auto explode_ts = timestamp(explode_at / timestamp::delta());
 
@@ -22,10 +28,6 @@ NAR_M::NAR_M(double ignite_at, double explode_at, std::string name, plogger logg
 
   controller_->add_action(ignite_ts, ignite);
   controller_->add_action(explode_ts, explode);
-}
-
-void NAR_M::arm() {
-  this->add_control_unit(std::move(controller_));
 }
 
 NAR_M::~NAR_M() = default;

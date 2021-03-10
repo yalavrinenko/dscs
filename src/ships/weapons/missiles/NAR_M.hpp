@@ -10,7 +10,10 @@ class timed_control;
 
 class NAR_M: public missile {
 public:
-  NAR_M(double ignite_at, double explode_at, std::string name, plogger logger);
+  NAR_M(std::string name, plogger logger);
+
+  void set_flight_parameter(double ignite_at, double explode_at);
+
   void arm() override;
   ~NAR_M() override;
 

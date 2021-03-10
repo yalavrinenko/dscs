@@ -46,33 +46,33 @@ int main(int argc, char **argv) {
   small_ship->equip();
   //small_ship->add_control_unit(std::make_unique<timed_control>());
 
-  auto nar = std::make_unique<NAR_M>(0.02, 1.0, "NAR-1",
-                                     plogger{factory_ptr->create_logger("NAR.missile", 1024 * 10), nullptr});
-
-  auto tank = resource_line_factory<fuel_tank_line>::construct_line(1, 100, 100, "", plogger{}, 4, 5000, 1, 1);
-  while (tank->push(100))
-    ;
-
-  auto battery = resource_line_factory<battery_line>::construct_line(1, 50, 50, "", plogger{}, 4, 5000, 1);
-  while (battery->push(100))
-    ;
-
-  fuel_pipe p(tank, battery, 0.01);
-  wire w(battery);
-
-  bool is_charged = false, is_refueled = false;
-  while (!is_charged || !is_refueled) {
-    if (!is_charged) is_charged = nar->charge(w);
-    if (!is_refueled) is_refueled = nar->refule(p);
-  }
+//  auto nar = std::make_unique<NAR_M>(0.02, 1.0, "NAR-1",
+//                                     plogger{factory_ptr->create_logger("NAR.missile", 1024 * 10), nullptr});
+//
+//  auto tank = resource_line_factory<fuel_tank_line>::construct_line(1, 100, 100, "", plogger{}, 4, 5000, 1, 1);
+//  while (tank->push(100))
+//    ;
+//
+//  auto battery = resource_line_factory<battery_line>::construct_line(1, 50, 50, "", plogger{}, 4, 5000, 1);
+//  while (battery->push(100))
+//    ;
+//
+//  fuel_pipe p(tank, battery, 0.01);
+//  wire w(battery);
+//
+//  bool is_charged = false, is_refueled = false;
+//  while (!is_charged || !is_refueled) {
+//    if (!is_charged) is_charged = nar->charge(w);
+//    if (!is_refueled) is_refueled = nar->refule(p);
+//  }
 
   space.add_object(std::move(small_ship), {0, 0}, {0.0, 0.0});
 
-  std::thread t([&space, &nar]() {
+  std::thread t([&space]() {
     std::this_thread::sleep_for(20s);
 
-    nar->arm();
-    space.add_object(std::move(nar), {0, 0}, {5.0, 0.0});
+//    nar->arm();
+//    space.add_object(std::move(nar), {0, 0}, {5.0, 0.0});
 
     std::this_thread::sleep_for(1200s);
     std::this_thread::sleep_for(30s);

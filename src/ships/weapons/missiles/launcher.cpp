@@ -15,7 +15,12 @@ launcher::launcher(double mass, std::string name, plogger logger, component_type
 
   add_gui_entry<gui::text_entry>(this->name());
   add_gui_entry<gui::numeric_entry>(this->name());
-  add_gui_entry<gui::launcher_entry>(this->name());
+  add_gui_entry<gui::launcher_entry>(this->name(),
+                                     gui::launcher_entry::callback_set{nullptr,
+                                                                       nullptr,
+                                                                       nullptr,
+                                                                       nullptr,
+                                                                       nullptr});
 }
 
 void launcher::action() {}
@@ -30,18 +35,22 @@ void launcher::draw() {
   num_gui->log("Fuel flow", fuel_consumption_);
 
   gui::launcher_log_data log_data;
-  log_data.loaded.emplace_back(gui::launcher_log_data::missile_info{
-      .fuel = 0.5,
-      .charge = 0.75,
-      .warhead = false,
-      .name = "Some Name"
-  });
-  log_data.loaded.emplace_back(gui::launcher_log_data::missile_info{
-      .fuel = 0.75,
-      .charge = 0.5,
-      .warhead = true,
-      .name = "Some Name"
-  });
+  log_data.total = loaded_.size() + ((cargo_) ? cargo_->count(component_type::hull) : 0);
+  for (auto &pl : loaded_){
+    log_data.loaded.emplace_back(gui::launcher_log_data::missile_info{
+        .fuel = pl.missile_ptr->fule(),
+        .charge = pl.missile_ptr->charge(),
+        .warhead = pl.is_armed,
+        .name = pl.missile_ptr->name(),
+        .lock_target = pl.is_locked,
+        .ready2fire = pl.is_ready2fire,
+    });
+  }
   entry<gui::launcher_entry>()->log(log_data);
 }
+
+void launcher::connect_cargo(std::shared_ptr<base_cargo> cargo) {
+  cargo_ = std::move(cargo);
+}
+
 launcher::~launcher() = default;

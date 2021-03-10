@@ -14,7 +14,7 @@
 class void_object:  public icomponent{
 public:
   explicit void_object(double mass, std::string name, plogger logger):
-    icomponent(mass, std::move(name), std::move(logger)){
+    icomponent(mass, std::move(name), std::move(logger), component_type::hull){
   }
 
   virtual void update(timestamp const &time) = 0;

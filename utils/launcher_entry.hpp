@@ -13,19 +13,32 @@ namespace gui {
       double charge{0};
       bool warhead{false};
       std::string name{};
+      size_t callback_index{};
+
+      bool lock_target;
+      bool ready2fire;
     };
+    size_t total;
     std::vector<missile_info> loaded;
   };
 
   class launcher_entry: public gui::ilogger_entry {
   public:
-    explicit launcher_entry(std::shared_ptr<logger_window> factory, std::string name);
+    using on_action_cb = std::function<void(size_t sender)>;
+    struct callback_set{
+      on_action_cb on_arm, on_lock, on_launch, on_disarm;
+      on_action_cb on_load;
+    };
+    launcher_entry(std::shared_ptr<logger_window> factory, std::string name,
+                   callback_set callbacks);
     void log(const launcher_log_data& log);
     void flush() override;
   protected:
     void draw_impl() override;
 
     cloned_data<launcher_log_data> data_;
+
+    callback_set callbacks_;
   };
 }
 

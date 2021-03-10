@@ -33,6 +33,8 @@ private:
   std::shared_ptr<engine> engine_;
   std::shared_ptr<warhead> warhead_;
 
+  std::unique_ptr<icontrol> control_;
+
   pbattery_line battery_;
   pfuel_tank_line fuel_;
 };

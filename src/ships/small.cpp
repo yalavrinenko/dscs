@@ -8,6 +8,8 @@
 #include <ships/weapons/missiles/launcher.hpp>
 #include <ships/cargo/base_cargo.hpp>
 
+#include <ships/weapons/missiles/NAR_M.hpp>
+
 small::small(std::string name, plogger logger) : ship_hull(1e+6, std::move(name), std::move(logger)) {
 }
 
@@ -110,6 +112,23 @@ void small::equip() {
 
   auto launcher_1 = std::make_shared<launcher>(1.0, "Missile launcher 1", this->slogger(), component_type::weapon,
                                                launcher_wire, launcher_refuel_pipe, 2);
+
+  auto cargo = std::make_shared<base_cargo>(1.0, "Main armory", this->slogger(), component_type::cargo, 500);
+
+  launcher_1->connect_cargo(cargo);
+
+  bool is_full = false;
+  for (auto i = 0; i < 20 && !is_full; ++i){
+    std::unique_ptr<icomponent> nar = std::make_unique<NAR_M>(
+        "NAR-" + std::to_string(i),
+        plogger{slogger().text_logger->factory()->create_logger("NAR.missile", 1024 * 10), nullptr});
+    is_full = !cargo->push_payload(nar);
+    if (!is_full)
+      std::clog << "Load missile " << i + 1 << std::endl;
+  }
+
+
   add_component(launcher_1, true);
+  add_component(cargo, false);
 }
 
