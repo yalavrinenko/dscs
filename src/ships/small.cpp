@@ -10,6 +10,10 @@
 
 #include <ships/weapons/missiles/NAR_M.hpp>
 
+struct SmallShipConstants{
+    static constexpr double max_main_cargo_capacity() { return 90; }
+};
+
 small::small(std::string name, plogger logger) : ship_hull(1e+6, std::move(name), std::move(logger)) {
 }
 
@@ -25,7 +29,7 @@ void small::construct_power_system() {
   unsigned const POWER_BANK_COUNT = 25;
 
   power_system_.main_battery_ = resource_line_factory<battery_line>::construct_line(
-      0.2, 100, 100, "Main power line", slogger(), POWER_BANK_COUNT, battery_config<component_size::medium>::capacity,
+      0.2, 100, 50, "Main power line", slogger(), POWER_BANK_COUNT, battery_config<component_size::medium>::capacity,
       battery_config<component_size::medium>::mass);
 
   fuel_pipe reactor_pipe(power_system_.reactor_fuel_, power_system_.main_battery_, 0.1);
@@ -113,7 +117,8 @@ void small::equip() {
   auto launcher_1 = std::make_shared<launcher>(1.0, "Missile launcher 1", this->slogger(), component_type::weapon,
                                                launcher_wire, launcher_refuel_pipe, 2);
 
-  auto cargo = std::make_shared<base_cargo>(1.0, "Main armory", this->slogger(), component_type::cargo, 500);
+  auto cargo = std::make_shared<base_cargo>(1.0, "Main Armory", this->slogger(),
+                                            component_type::cargo, SmallShipConstants::max_main_cargo_capacity());
 
   launcher_1->connect_cargo(cargo);
 
@@ -127,8 +132,13 @@ void small::equip() {
       std::clog << "Load missile " << i + 1 << std::endl;
   }
 
-
   add_component(launcher_1, true);
-  add_component(cargo, false);
+  add_component(cargo, true);
 }
-
+bool small::load_cargo(pcomponent &payload) {
+  auto cargo = command_interface_.find_interface<base_cargo>("Main Armory");
+  if (cargo)
+    return cargo->push_payload(payload);
+  else
+    return false;
+}

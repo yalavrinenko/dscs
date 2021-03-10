@@ -17,6 +17,8 @@ public:
 
   bool push_payload(pcomponent &payload);
 
+  std::unique_ptr<icomponent> extract_payload(component_type ctype);
+
   auto count(component_type type) const {
     return std::ranges::count_if(payload_, [type](auto &e){ return e->type() == type; });
   }

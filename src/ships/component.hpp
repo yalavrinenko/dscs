@@ -23,6 +23,19 @@ enum class component_type{
   none
 };
 
+namespace Utils {
+  template<typename to_t, typename from_t>
+  std::unique_ptr<to_t> dynamic_unique_cast(std::unique_ptr<from_t> &&p) {
+    if (to_t *cast = dynamic_cast<to_t *>(p.get())) {
+      std::unique_ptr<to_t> result(cast);
+      p.release();
+      return result;
+    }
+    return std::unique_ptr<to_t>(nullptr);
+  }
+};
+
+
 class icomponent: public gui::igui_object{
 public:
   icomponent(double mass, std::string name, plogger logger, component_type type = component_type::none)

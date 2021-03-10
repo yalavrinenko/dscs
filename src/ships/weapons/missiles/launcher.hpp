@@ -11,6 +11,11 @@
 
 class base_cargo;
 
+struct LauncherOperationConstant{
+  static constexpr double charge4load() { return 100.0; }
+  static constexpr double income_current_reduction() { return 0.1; }
+};
+
 class launcher: public icomponent{
 public:
   launcher(double mass, std::string name, plogger logger, component_type type, wire power, fuel_pipe pipe,
@@ -24,6 +29,8 @@ public:
 
   ~launcher() override;
 protected:
+  void load_from_cargo();
+
   std::shared_ptr<base_cargo> cargo_;
   wire power_;
   fuel_pipe fuel_;
@@ -35,6 +42,7 @@ protected:
   double fuel_consumption_{};
 
   enum missile_action{
+    load,
     idle,
     refuel,
     charge,
@@ -47,7 +55,9 @@ protected:
     bool is_locked{false};
     bool is_ready2fire{false};
 
-    std::atomic<missile_action> next_action;
+    missile_action next_action;
+
+    double load_progress{0};
   };
 
   std::vector<missile_info> loaded_;

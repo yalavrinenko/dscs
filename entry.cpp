@@ -44,6 +44,13 @@ int main(int argc, char **argv) {
   auto text_log = factory_ptr->create_logger("S1.ship", 1024 * 10);
   auto small_ship = std::make_unique<small>("Ship_S", plogger{text_log, gui_ship});
   small_ship->equip();
+
+  for (std::weakly_incrementable auto i: std::views::iota(0, 20)) {
+    std::unique_ptr<icomponent> wh = std::make_unique<warhead>(2.0, "WH-" + std::to_string(i), space.remove_object_callback());
+    if (small_ship->load_cargo(wh))
+      std::clog << "Load warhead " << i + 1 << std::endl;
+  }
+
   //small_ship->add_control_unit(std::make_unique<timed_control>());
 
 //  auto nar = std::make_unique<NAR_M>(0.02, 1.0, "NAR-1",

@@ -17,6 +17,7 @@ public:
   vector_2d force(timestamp const &time) override;
 
   void equip();
+  bool load_cargo(pcomponent &payload);
 
 protected:
   struct {

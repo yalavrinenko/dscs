@@ -17,6 +17,7 @@ namespace gui {
 
       bool lock_target;
       bool ready2fire;
+      double load_progress;
     };
     size_t total;
     std::vector<missile_info> loaded;

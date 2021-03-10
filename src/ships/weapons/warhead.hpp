@@ -12,10 +12,14 @@ class warhead: public icomponent {
 public:
   using explode_callback = std::function<void(void_object const* carrier_object_, double explosion_radius)>;
 
-  warhead(double mass, std::string name, auto const *carrier, warhead::explode_callback explode)
+  warhead(double mass, std::string name, warhead::explode_callback explode)
       : icomponent(mass, std::move(name), plogger(), component_type::warhead),
         call_explosion_(std::move(explode)),
-        carrier_object_{carrier}, explosion_radius_{mass_to_explosion_r(mass)} {}
+        explosion_radius_{mass_to_explosion_r(mass)} {}
+
+  void set_carrier_object(auto const* carrier){
+    carrier_object_ = carrier;
+  }
 
   void action() override;
   void log_action() const override;
