@@ -23,6 +23,8 @@ public:
   virtual void flush() = 0;
 
   std::shared_ptr<class logger_window>& factory() { return linked_factory_; }
+
+  virtual ~ilogger_entry() = default;
 protected:
   virtual void draw_impl() = 0;
   std::shared_ptr<class logger_window> linked_factory_;

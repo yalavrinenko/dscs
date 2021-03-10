@@ -10,11 +10,13 @@ NAR_M::NAR_M(double ignite_at, double explode_at, std::string name, plogger logg
   auto ignite_ts = timestamp(ignite_at / timestamp::delta());
   auto explode_ts = timestamp(explode_at / timestamp::delta());
 
-  auto ignite = [](icontrol::component_group<pengine> &eng, auto &, auto &){
+  auto ignite = [name = this->name()](icontrol::component_group<pengine> &eng){
+    std::clog << "Ignite engine in missile " << name << std::endl;
     eng.apply([](pengine &eng) { eng->ignite(); eng->set_max_thrust(1.0); });
   };
 
-  auto explode = [](auto &, auto&, icontrol::component_group<pwarhead> &wh){
+  auto explode = [name = this->name()](icontrol::component_group<pwarhead> &wh){
+    std::clog << "Explode warhead in missile " << name << std::endl;
     wh.apply([](pwarhead &wh) { wh->explode(); });
   };
 

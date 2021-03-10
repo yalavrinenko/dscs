@@ -16,6 +16,8 @@ public:
   small(std::string name, plogger logger);
   vector_2d force(timestamp const &time) override;
 
+  void equip();
+
 protected:
   struct {
     std::shared_ptr<reactor> master_core_, slave_core_;

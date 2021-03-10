@@ -4,11 +4,8 @@
 
 #include "time_controller.hpp"
 #include "../control_events/base_events.hpp"
-std::vector<control_action> timed_control::control(timestamp const &ts,
+std::vector<control_action> timed_control::control_impl(timestamp const &ts,
                                       control_interface &ship) {
-  if (!reactors.ready2use || !engines.ready2use || !payloads.ready2use)
-    construct_component_groups(ship);
-
   if (begin_ == timestamp{})
     begin_ = ts;
 
@@ -18,7 +15,7 @@ std::vector<control_action> timed_control::control(timestamp const &ts,
     auto action = queue_.top().second;
 
     auto act_func = [this, action](timestamp const& ts) {
-      action(engines, reactors, payloads);
+      perform_action(action);
     };
     actions.emplace_back(act_func, ts);
 
@@ -27,6 +24,6 @@ std::vector<control_action> timed_control::control(timestamp const &ts,
 
   return actions;
 }
-void timed_control::add_action(timestamp ts, timed_control::action_function action) {
+void timed_control::add_action(timestamp ts, time_action_function action) {
   queue_.emplace(ts, std::move(action));
 }

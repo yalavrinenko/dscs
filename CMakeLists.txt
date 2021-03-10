@@ -16,7 +16,7 @@ find_package(OpenGL)
 find_package(ImGui-SFML REQUIRED)
 find_package(X11)
 
-set(GUI_SRC utils/guilogger.cpp utils/guilogger.hpp utils/gui_entries.cpp utils/gui_entries.hpp utils/gui_input.cpp)
+set(GUI_SRC utils/guilogger.cpp utils/guilogger.hpp utils/gui_entries.cpp utils/gui_entries.hpp utils/gui_input.cpp utils/launcher_entry.cpp utils/launcher_entry.hpp)
 add_library(gui SHARED ${GUI_SRC})
 include_directories(~/Files/apis/SFML/build/include ~/Files/apis/imgui-sfml/build/include
         "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -42,7 +42,7 @@ target_link_libraries(logger stdc++fs)
 
 add_subdirectory(tests)
 
-add_library(dscs-lib ${SRC} ${HEADERS} src/ships/weapons/missiles/missile.cpp src/ships/weapons/missiles/missile.hpp src/ships/weapons/missiles/NAR_M.cpp src/ships/weapons/missiles/NAR_M.hpp)
+add_library(dscs-lib ${SRC} ${HEADERS} src/ships/weapons/missiles/missile.cpp src/ships/weapons/missiles/missile.hpp src/ships/weapons/missiles/NAR_M.cpp src/ships/weapons/missiles/NAR_M.hpp src/ships/cargo/base_cargo.cpp src/ships/cargo/base_cargo.hpp src/ships/weapons/missiles/launcher.cpp src/ships/weapons/missiles/launcher.hpp)
 add_executable(dscs entry.cpp)
 
 target_link_libraries(dscs stdc++fs pthread gui dscs-lib logger)

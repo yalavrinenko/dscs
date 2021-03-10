@@ -48,6 +48,7 @@ void gui::logger_window::events() {
 
     if (event.type == sf::Event::Closed) {
       window_.close();
+      std::exit(0);
     }
   }
 }

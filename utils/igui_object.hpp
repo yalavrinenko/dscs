@@ -42,6 +42,8 @@ public:
   }
 
   virtual void draw() = 0;
+
+  virtual ~igui_object() = default;
 protected:
   std::vector<std::shared_ptr<gui::ilogger_entry>> entries_;
   plog_window window_ = nullptr;

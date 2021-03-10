@@ -18,6 +18,9 @@ public:
 
   bool charge(wire &source);
 
+  double fule() const { return fuel_->percent_load(); }
+  double charge() const { return battery_->percent_load(); }
+
   bool refule(fuel_pipe &source);
 
   vector_2d force(timestamp const &time) override;

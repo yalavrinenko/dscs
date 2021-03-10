@@ -18,6 +18,8 @@ enum class component_type{
   radio,
   monitor_unit,
   warhead,
+  cargo,
+  weapon,
   none
 };
 
@@ -44,6 +46,8 @@ public:
   auto const& name() const {return name_;};
 
   component_type type() const { return type_; }
+
+  virtual ~icomponent() = default;
 protected:
   double mass_{};
 

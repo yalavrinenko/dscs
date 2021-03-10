@@ -3,15 +3,14 @@
 //
 
 #include "remote_control.hpp"
-std::vector<control_action>
-radio_control_unit::control(timestamp const &ts, control_interface &ship) {
+std::vector<control_action> radio_control_unit::control_impl(const timestamp &ts, control_interface &ship) {
   if (is_first){
     is_first = false;
     t = ts;
   }
 
   if (ts == t + 20){
- //   auto rotate = [](pengine &engine){ engine->align(45.0); };
+    //   auto rotate = [](pengine &engine){ engine->align(45.0); };
 //    engines.apply(rotate);
   }
 

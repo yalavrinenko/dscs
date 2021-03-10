@@ -12,8 +12,8 @@ class radio_control_unit: public icontrol{
 public:
   explicit radio_control_unit(std::shared_ptr<radio_unit> radio, control_interface &ship): icontrol(ship), radio_(std::move(radio)){}
 
-  std::vector<control_action> control(timestamp const &ts, control_interface &ship) override;
-
+protected:
+  std::vector<control_action> control_impl(timestamp const &ts, control_interface &ship) override;
 private:
   std::shared_ptr<radio_unit> radio_;
   timestamp t;
