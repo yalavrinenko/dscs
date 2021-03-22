@@ -10,6 +10,7 @@ namespace gui {
   class radar_entry : public ilogger_entry {
   public:
     using radar_selection_callback = std::function<void(double r, double phi)>;
+    using radar_unary_callback = std::function<void(size_t)>;
     struct radar_point {
       double r;
       double phi;
@@ -42,8 +43,11 @@ namespace gui {
 
     void flush() override { data_.swap(); tracked_.swap(); }
 
-    void set_callback(radar_selection_callback on_select) {
+    void set_callbacks(radar_selection_callback on_select, radar_unary_callback on_unlock,
+                       radar_unary_callback on_target) {
       on_select_ = on_select;
+      on_unlock_ = on_unlock;
+      on_target_ = on_target;
     }
 
   protected:
@@ -57,6 +61,8 @@ namespace gui {
     size_t segments_{1};
 
     radar_selection_callback on_select_ = nullptr;
+    radar_unary_callback on_unlock_ = nullptr;
+    radar_unary_callback on_target_ = nullptr;
   };
 }
 

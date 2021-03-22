@@ -70,17 +70,22 @@ void gui::launcher_entry::draw_impl() {
         circle_draw((m.lock_target) ? ImColor{0, 255, 0} : ImColor{255, 0, 0}, 20);
 
         ImGui::NextColumn();
+
+        auto create_title = [](std::string const& title, size_t uid){
+          return (title + "##" + std::to_string(uid));
+        };
+
         if (!m.warhead) {
-          if (ImGui::Button("ARM"))
+          if (ImGui::Button(create_title("ARM", m.callback_index).c_str()))
             callbacks_.on_arm(m.callback_index);
         } else {
-          if (ImGui::Button("DISARM")) callbacks_.on_disarm(m.callback_index);
+          if (ImGui::Button(create_title("DISARM", m.callback_index).c_str())) callbacks_.on_disarm(m.callback_index);
         }
         ImGui::SameLine();
-        if (ImGui::Button("LOCK")) callbacks_.on_lock(m.callback_index);
+        if (ImGui::Button(create_title("LOCK", m.callback_index).c_str())) callbacks_.on_lock(m.callback_index);
         if (m.ready2fire) {
           ImGui::SameLine();
-          if (ImGui::Button("LAUNCH")) callbacks_.on_launch(m.callback_index);
+          if (ImGui::Button(create_title("LAUNCH", m.callback_index).c_str())) callbacks_.on_launch(m.callback_index);
         }
 
         ImGui::Separator();

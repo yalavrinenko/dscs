@@ -95,10 +95,18 @@ void gui::radar_entry::draw_impl() {
     ImGui::Text("Target uid: %s\n"
                 "Distance: %0.6lf\n"
                 "Direction: %0.6lf\n"
-                "Velocity (r, phi): \n\t\t(%0.3lf, %0.3lf)\n"
-                "Acceleration (r, phi): \n\t\t(%0.3lf, %0.3lf)\n", point.description.c_str(), point.r, dec(point.phi),
-                point.velocity.first, dec(point.velocity.second),
-                point.acceleration.first, dec(point.acceleration.second));
+                "Velocity (X, Y): \n\t\t(%0.3lf, %0.3lf)\n"
+                "Acceleration (X, Y): \n\t\t(%0.3lf, %0.3lf)\n", point.description.c_str(), point.r, dec(point.phi),
+                point.velocity.first, point.velocity.second,
+                point.acceleration.first, point.acceleration.second);
+    auto uid = point.uid;
+    if (ImGui::Button(("Unlock##" + std::to_string(uid)).c_str()) && on_unlock_){
+      on_unlock_(uid);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(("As target##" + std::to_string(uid)).c_str()) && on_target_){
+      on_target_(uid);
+    }
     column_separator();
   }
   ImGui::Columns(1);

@@ -5,13 +5,13 @@
 #ifndef DSCS_COMMAND_UNIT_HPP
 #define DSCS_COMMAND_UNIT_HPP
 #include <src/ships/component.hpp>
-#include <src/ships/detection/radar.hpp>
 #include <src/ships/detection/object_tracker.hpp>
-#include <utils/radar_entry.hpp>
-#include <utility>
+#include <src/ships/detection/radar.hpp>
 #include <stack>
+#include <utility>
+#include <utils/radar_entry.hpp>
 
-struct CommandUnitConstanst{
+struct CommandUnitConstanst {
   static constexpr auto CHARGE_FOR_LOCK = 1.0;
   static constexpr auto CHARGE_FOR_TRACK = 10.0;
 };
@@ -34,9 +34,16 @@ public:
     gui.long_range_radar_log_ = add_gui_entry<gui::radar_entry>(
         this->name(), long_range_radar_->range() * PhysUnit::EM_SPEED(), long_range_radar_->range());
 
-    gui.long_range_radar_log_->set_callback([this](double r, double phi){
-      lock_stack_.push(polar_vector{r, phi});
-    });
+    gui.long_range_radar_log_->set_callbacks(
+        [this](double r, double phi) {
+          lock_stack_.push(polar_vector{r, phi});
+        },
+        [this](size_t uid) { tracker_.unlock(uid); },
+        [this](size_t uid) {
+          if (current_lock_target_ && *current_lock_target_ == uid) current_lock_target_ = {};
+          else
+            current_lock_target_ = uid;
+        });
   }
 
 protected:
@@ -49,6 +56,8 @@ protected:
   } gui;
 
   std::stack<polar_vector> lock_stack_;
+
+  std::optional<size_t> current_lock_target_{};
 
   timestamp inner_ts_;
   wire power_;
