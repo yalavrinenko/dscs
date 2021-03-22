@@ -4,18 +4,17 @@
 
 #include "small.hpp"
 #include "../component-factrory.hpp"
-#include <src/ships/control/command_unit.hpp>
-#include <ships/weapons/missiles/launcher.hpp>
 #include <ships/cargo/base_cargo.hpp>
+#include <ships/weapons/missiles/launcher.hpp>
+#include <src/ships/control/command_unit.hpp>
 
 #include <ships/weapons/missiles/NAR_M.hpp>
 
-struct SmallShipConstants{
-    static constexpr double max_main_cargo_capacity() { return 90; }
+struct SmallShipConstants {
+  static constexpr double max_main_cargo_capacity() { return 90; }
 };
 
-small::small(std::string name, plogger logger) : ship_hull(1e+6, std::move(name), std::move(logger)) {
-}
+small::small(std::string name, plogger logger) : ship_hull(1e+6, std::move(name), std::move(logger)) {}
 
 void small::construct_power_system() {
   power_system_.reactor_fuel_ = std::make_shared<fuel_tank_line>(1.0, 100, 10, "Main reactor fuel line", slogger());
@@ -104,8 +103,8 @@ void small::equip() {
   radar_ = std::make_shared<radar>(radio_unit_config<component_size::medium>::mass, 5, r_option, this->env_.EM_Field(),
                                    "Main Radar", this->slogger());
 
-  auto ucontrol =
-      std::make_shared<command_unit>(1.0, "Main control unit", this->slogger(), component_type::monitor_unit);
+  auto ucontrol = std::make_shared<command_unit>(wire(power_system_.main_battery_), 1.0, "Main control unit",
+                                                 this->slogger(), component_type::monitor_unit);
   ucontrol->register_long_range_radar(radar_);
 
   add_component(radar_, true);
@@ -117,19 +116,18 @@ void small::equip() {
   auto launcher_1 = std::make_shared<launcher>(1.0, "Missile launcher 1", this->slogger(), component_type::weapon,
                                                launcher_wire, launcher_refuel_pipe, 2);
 
-  auto cargo = std::make_shared<base_cargo>(1.0, "Main Armory", this->slogger(),
-                                            component_type::cargo, SmallShipConstants::max_main_cargo_capacity());
+  auto cargo = std::make_shared<base_cargo>(1.0, "Main Armory", this->slogger(), component_type::cargo,
+                                            SmallShipConstants::max_main_cargo_capacity());
 
   launcher_1->connect_cargo(cargo);
 
   bool is_full = false;
-  for (auto i = 0; i < 20 && !is_full; ++i){
+  for (auto i = 0; i < 20 && !is_full; ++i) {
     std::unique_ptr<icomponent> nar = std::make_unique<NAR_M>(
         "NAR-" + std::to_string(i),
         plogger{slogger().text_logger->factory()->create_logger("NAR.missile", 1024 * 10), nullptr});
     is_full = !cargo->push_payload(nar);
-    if (!is_full)
-      std::clog << "Load missile " << i + 1 << std::endl;
+    if (!is_full) std::clog << "Load missile " << i + 1 << std::endl;
   }
 
   add_component(launcher_1, true);
@@ -137,8 +135,7 @@ void small::equip() {
 }
 bool small::load_cargo(pcomponent &payload) {
   auto cargo = command_interface_.find_interface<base_cargo>("Main Armory");
-  if (cargo)
-    return cargo->push_payload(payload);
+  if (cargo) return cargo->push_payload(payload);
   else
     return false;
 }

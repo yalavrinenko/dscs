@@ -60,7 +60,7 @@ public:
 
   component_type type() const { return type_; }
 
-  virtual ~icomponent() = default;
+  ~icomponent() override = default;
 protected:
   double mass_{};
 

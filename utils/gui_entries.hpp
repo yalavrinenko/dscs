@@ -111,39 +111,5 @@ protected:
   cloned_data<std::pair<std::string, unary_function>> data_;
   double const max_r_;
 };
-
-class radar_entry: public ilogger_entry{
-public:
-
-  struct radar_point{
-    double r;
-    double phi;
-    std::string description;
-  };
-
-  using unary_function = std::function<std::pair<double, double>(int)>;
-
-  static inline double pi() { return std::atan(1.0) * 4.0; }
-
-  explicit radar_entry(std::shared_ptr<class logger_window> factory,
-                       std::string name, double max_r, size_t segments);
-
-  void log(radar_point point){
-    data_.tmp().emplace_back(point);
-  }
-
-  void change_range(double max_r, size_t segments) {
-    max_r_ = max_r; segments_ = segments;
-  }
-
-  void flush() override { data_.swap(); }
-
-protected:
-  void draw_impl() override;
-
-  cloned_data<radar_point> data_;
-  double max_r_;
-  size_t segments_{1};
-};
 } // namespace gui
 #endif // DSCS_GUI_ENTRIES_HPP

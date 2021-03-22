@@ -32,13 +32,16 @@ int main(int argc, char **argv) {
   void_map space(factory_ptr, gui_factory);
 
   Random r;
-  int N = 10;
+  [[maybe_unused]] int N = 10;
 
-  for (auto i = 0; i < N; ++i) {
-    auto hulk = std::make_unique<drifting_hulk>(r.uniform(1000, 10000));
+  //for (auto i = 0; i < N; ++i) {
 
-    space.add_object(std::move(hulk), r.uniform_v(-300, 300), r.uniform_v(-10, 10));
-  }
+    //space.add_object(std::move(hulk), r.uniform_v(-300, 300), r.uniform_v(-100, 100));
+  space.add_object(std::make_unique<drifting_hulk>(r.uniform(1000, 10000)), {100, 100}, {-10, -10});
+  space.add_object(std::make_unique<drifting_hulk>(r.uniform(1000, 10000)), {-100, 100}, {10, -10});
+  space.add_object(std::make_unique<drifting_hulk>(r.uniform(1000, 10000)), {100, -100}, {-10, 10});
+  space.add_object(std::make_unique<drifting_hulk>(r.uniform(1000, 10000)), {-100, -100}, {10, 10});
+  //}
 
   auto gui_ship = gui_factory->create_logger("Ship_S");
   auto text_log = factory_ptr->create_logger("S1.ship", 1024 * 10);

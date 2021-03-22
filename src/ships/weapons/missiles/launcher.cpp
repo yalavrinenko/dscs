@@ -11,7 +11,7 @@ launcher::launcher(double mass, std::string name, plogger logger, component_type
                    size_t launch_pads)
     : icomponent(mass, std::move(name), std::move(logger), type), power_(std::move(power)),
       fuel_(std::move(pipe)), launch_pads_{launch_pads} {
-  cargo_ = std::make_unique<base_cargo>(0.1, this->name() + ": cargo", slogger(), component_type::cargo, 10.0);
+  //cargo_ = std::make_unique<base_cargo>(0.1, this->name() + ": cargo", slogger(), component_type::cargo, 10.0);
 
   add_gui_entry<gui::text_entry>(this->name());
   add_gui_entry<gui::numeric_entry>(this->name());
@@ -76,7 +76,7 @@ void launcher::draw() {
   num_gui->log("Fuel flow", fuel_consumption_);
 
   gui::launcher_log_data log_data;
-  log_data.total = loaded_.size() + ((cargo_) ? cargo_->count(component_type::hull) : 0);
+  log_data.total = ((cargo_) ? cargo_->count(component_type::hull) : 0);
   for (auto i = 0ul; auto &pl : loaded_) {
     log_data.loaded.emplace_back(gui::launcher_log_data::missile_info{
         .fuel = (pl.missile_ptr) ? pl.missile_ptr->fule() : 0,

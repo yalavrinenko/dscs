@@ -115,10 +115,45 @@ struct vector_2d{
 
   [[nodiscard]] vector_2d in_polar() const {
     auto norm_this = *this; norm_this.norm();
-    return {this->len(), std::atan2(norm_this.y, norm_this.x)};
+    return {this->len(), norm_this.len() * std::atan2(norm_this.y, norm_this.x)};
   }
 
   double x{0}, y{0};
+};
+
+struct polar_vector: public vector_2d{
+  using vector_2d::vector_2d;
+  using vector_2d::operator*;
+
+  polar_vector(vector_2d const& rhs): vector_2d(rhs) {}
+  polar_vector& operator=(polar_vector const &rhs){
+    x = rhs.x;
+    y = rhs.y;
+    return *this;
+  }
+  polar_vector& operator=(vector_2d const& rhs) {
+    x = rhs.x; y = rhs.y;
+    return *this;
+  }
+
+  [[nodiscard]] auto distance(polar_vector const& rhs) const {
+    return std::sqrt(r() * r() + rhs.r() * rhs.r() - 2.0 * r() * rhs.r() * std::cos(rhs.phi() - rhs.phi()));
+  }
+
+  [[nodiscard]] auto in_cartesian() const {
+    return vector_2d{r() * std::cos(phi()), r() * std::sin(phi())};
+  }
+
+  operator std::pair<double, double> (){
+    return {r(), phi()};
+  }
+
+  double& r() { return x; }
+  double const& r() const { return x; }
+
+  double& phi() { return y; }
+  double const& phi() const { return y; }
+
 };
 
 struct space{
