@@ -11,6 +11,8 @@
 #include "tank/pipe_and_wire.hpp"
 #include "detection/radar.hpp"
 
+class void_map;
+
 class small : public ship_hull{
 public:
   small(std::string name, plogger logger);

@@ -8,6 +8,8 @@
 #include <ships/weapons/missiles/launcher.hpp>
 #include <src/ships/control/command_unit.hpp>
 
+#include <void_map.hpp>
+
 #include <ships/weapons/missiles/NAR_M.hpp>
 
 struct SmallShipConstants {
@@ -120,6 +122,8 @@ void small::equip() {
                                             SmallShipConstants::max_main_cargo_capacity());
 
   launcher_1->connect_cargo(cargo);
+  launcher_1->connect_command_unit(ucontrol);
+  launcher_1->set_launch_environment()
 
   bool is_full = false;
   for (auto i = 0; i < 20 && !is_full; ++i) {

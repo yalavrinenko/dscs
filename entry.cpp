@@ -34,17 +34,15 @@ int main(int argc, char **argv) {
   Random r;
   [[maybe_unused]] int N = 10;
 
-  //for (auto i = 0; i < N; ++i) {
+  for ([[maybe_unused]] std::weakly_incrementable auto i : std::views::iota(0, N)) {
 
-    //space.add_object(std::move(hulk), r.uniform_v(-300, 300), r.uniform_v(-100, 100));
-  space.add_object(std::make_unique<drifting_hulk>(r.uniform(1000, 10000)), {100, 100}, {-20, -20});
-  space.add_object(std::make_unique<drifting_hulk>(r.uniform(1000, 10000)), {-100, 100}, {20, -20});
-  space.add_object(std::make_unique<drifting_hulk>(r.uniform(1000, 10000)), {100, -100}, {-20, 20});
-  space.add_object(std::make_unique<drifting_hulk>(r.uniform(1000, 10000)), {-100, -100}, {20, 20});
-  //}
+    space.add_object(std::make_unique<drifting_hulk>(r.uniform(1000, 10000)), r.uniform_v(-300, 300),
+                     r.uniform_v(-100, 100));
+  }
 
   auto gui_ship = gui_factory->create_logger("Ship_S");
   auto text_log = factory_ptr->create_logger("S1.ship", 1024 * 10);
+  //**************Ship****************************
   auto small_ship = std::make_unique<small>("Ship_S", plogger{text_log, gui_ship});
   small_ship->equip();
 
@@ -54,10 +52,13 @@ int main(int argc, char **argv) {
       std::clog << "Load warhead " << i + 1 << std::endl;
   }
 
+  space.add_object(std::move(small_ship), {0, 0}, {0.0, 0.0});
   //small_ship->add_control_unit(std::make_unique<timed_control>());
+  //**************Ship****************************
 
-//  auto nar = std::make_unique<NAR_M>(0.02, 1.0, "NAR-1",
-//                                     plogger{factory_ptr->create_logger("NAR.missile", 1024 * 10), nullptr});
+  //******************************TestMissile************************************
+//  auto nar = std::make_unique<NAR_M>("NAR-1",
+//                                     plogger{factory_ptr->create_logger("NAR.missile", 1024 * 10), gui_ship});
 //
 //  auto tank = resource_line_factory<fuel_tank_line>::construct_line(1, 100, 100, "", plogger{}, 4, 5000, 1, 1);
 //  while (tank->push(100))
@@ -75,15 +76,15 @@ int main(int argc, char **argv) {
 //    if (!is_charged) is_charged = nar->charge(w);
 //    if (!is_refueled) is_refueled = nar->refule(p);
 //  }
-
-  space.add_object(std::move(small_ship), {0, 0}, {0.0, 0.0});
+//
+//
+//    //nar->set_flight_parameter(5.0, 1000.0);
+//    nar->arm();
+//    space.add_object(std::move(nar), {0, 0}, {0.0, 0.0});
+  //******************************TestMissile
 
   std::thread t([&space]() {
     std::this_thread::sleep_for(20s);
-
-//    nar->arm();
-//    space.add_object(std::move(nar), {0, 0}, {5.0, 0.0});
-
     std::this_thread::sleep_for(1200s);
     std::this_thread::sleep_for(30s);
     space.stop();

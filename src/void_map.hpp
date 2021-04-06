@@ -26,6 +26,7 @@ public:
                           vector_2d const &velocity);
 
   virtual std::function<void(void_object const*, double)> remove_object_callback();
+  virtual std::function<void(pvoid_object &&object, vector_2d const& velocity)> add_object_callback(pvoid_object const& launcher);
 
   virtual void update();
 

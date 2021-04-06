@@ -17,6 +17,11 @@ public:
   void arm() override;
   ~NAR_M() override;
 
+  struct missile_parameters{
+    static constexpr double ignite_time = 0.1;
+    static constexpr double peak_velocity = 2.0;
+  };
+
 private:
   std::unique_ptr<timed_control> controller_;
 };

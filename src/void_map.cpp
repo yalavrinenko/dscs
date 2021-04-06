@@ -132,3 +132,10 @@ void void_map::remove_queued_objects() {
 
   remove_object_queue_.clear();
 }
+std::function<void(pvoid_object &&object, vector_2d const &velocity)>
+void_map::add_object_callback(const pvoid_object &launcher) {
+  return [this, parent = launcher.get()](auto &&obj, auto const& v){
+    auto position = find_object(parent).position;
+    add_object(std::forward<decltype(obj)>(obj), position, v);
+  };
+}

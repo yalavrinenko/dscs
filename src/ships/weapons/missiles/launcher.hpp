@@ -10,6 +10,7 @@
 #include <ships/weapons/missiles/missile.hpp>
 
 class base_cargo;
+class command_unit;
 
 struct LauncherOperationConstant{
   static constexpr double charge4load() { return 100.0; }
@@ -18,19 +19,31 @@ struct LauncherOperationConstant{
 
 class launcher: public icomponent{
 public:
+  using launch_callback = std::function<void(pvoid_object &&object, vector_2d const &velocity)>;
+
   launcher(double mass, std::string name, plogger logger, component_type type, wire power, fuel_pipe pipe,
            size_t launch_pads);
+
+  void set_launch_environment(launch_callback cb) { on_launch_ = std::move(cb); }
 
   void action() override;
   void log_action() const override;
   void draw() override;
 
   void connect_cargo(std::shared_ptr<base_cargo> cargo);
+  void connect_command_unit(std::shared_ptr<command_unit> &unit);
 
   ~launcher() override;
-protected:
-  void load_from_cargo();
 
+private:
+
+  void init_actions();
+
+  auto gui_calbacks();
+  auto evaluate_approaching_time(auto const& target);
+
+  launch_callback on_launch_;
+  std::shared_ptr<command_unit> cunit_;
   std::shared_ptr<base_cargo> cargo_;
   wire power_;
   fuel_pipe fuel_;
@@ -46,6 +59,8 @@ protected:
     idle,
     refuel,
     charge,
+    lock,
+    unlock,
     fire
   };
 
@@ -58,10 +73,18 @@ protected:
     missile_action next_action;
 
     double load_progress{0};
+
+    struct {
+      vector_2d target_position;
+      vector_2d launch_velocity;
+
+      double ignite_time;
+      double explode_time;
+    } lock_info;
   };
 
   std::vector<missile_info> loaded_;
-
+  std::unordered_map<missile_action, std::function<void(missile_info&)>> main_actions_;
 };
 
 

@@ -46,6 +46,14 @@ public:
         });
   }
 
+  bool target_selected() const {
+    return current_lock_target_.has_value();
+  }
+
+  decltype(auto) target() const {
+    return tracker_.target(*current_lock_target_);
+  }
+
 protected:
   std::shared_ptr<long_range_radar<radio_unit, radio_transmitter_option>> long_range_radar_ = nullptr;
   object_tracker tracker_;

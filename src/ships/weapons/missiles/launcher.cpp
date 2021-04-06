@@ -6,7 +6,51 @@
 #include <ships/cargo/base_cargo.hpp>
 #include <utils/launcher_entry.hpp>
 
+#include <ships/weapons/missiles/NAR_M.hpp>
+
 #include <utility>
+#include <ships/control/command_unit.hpp>
+
+auto launcher::gui_calbacks() {
+  auto arm = [this](int m) {
+    std::clog << "Arm " << m << " object\n";
+    loaded_[m].next_action = missile_action::charge;
+  };
+
+  auto lock = [this](size_t target) {
+    if (this->loaded_[target].is_armed)
+      this->loaded_[target].next_action = missile_action::lock;
+  };
+
+  auto load = [this](size_t){
+    if (this->loaded_.size() < this->launch_pads_) {
+      this->loaded_.emplace_back(missile_info{.missile_ptr = nullptr,
+                                              .is_armed = false,
+                                              .is_locked = false,
+                                              .is_ready2fire = false,
+                                              .next_action = missile_action::load,
+                                              .load_progress = 0.0});
+    }
+  };
+
+  auto disarm = [this](size_t target) {
+    if (this->loaded_[target].is_armed) this->loaded_[target].next_action = missile_action::unlock;
+  };
+
+  auto launch = [this](size_t target){
+    if (loaded_[target].is_ready2fire)
+      loaded_[target].next_action = missile_action::fire;
+  };
+
+  gui::launcher_entry::callback_set cbs{.on_arm = arm,
+                                        .on_lock = lock,
+                                        .on_launch = launch,
+                                        .on_disarm = disarm,
+                                        .on_load = load};
+
+  return cbs;
+}
+
 launcher::launcher(double mass, std::string name, plogger logger, component_type type, wire power, fuel_pipe pipe,
                    size_t launch_pads)
     : icomponent(mass, std::move(name), std::move(logger), type), power_(std::move(power)),
@@ -15,55 +59,12 @@ launcher::launcher(double mass, std::string name, plogger logger, component_type
 
   add_gui_entry<gui::text_entry>(this->name());
   add_gui_entry<gui::numeric_entry>(this->name());
-  add_gui_entry<gui::launcher_entry>(
-      this->name(),
-      gui::launcher_entry::callback_set{.on_arm = [this](int m) {
-                                          std::clog << "Arm " << m << " object\n";
-                                          loaded_[m].next_action = missile_action::charge;
-                                        },
-                                        .on_lock = nullptr,
-                                        .on_launch = nullptr,
-                                        .on_disarm = nullptr,
-                                        .on_load =
-                                            [this](int) {
-                                              if (this->loaded_.size() < this->launch_pads_) this->load_from_cargo();
-                                            }});
+  add_gui_entry<gui::launcher_entry>(this->name(), gui_calbacks());
+  init_actions();
 }
 
 void launcher::action() {
-  for (auto &m : loaded_) {
-    switch (m.next_action) {
-      case missile_action::load: {
-        auto req = (1.0 - m.load_progress) * LauncherOperationConstant::charge4load() *
-                   LauncherOperationConstant::income_current_reduction();
-        auto get = power_.pull(req);
-        m.load_progress += get / req * LauncherOperationConstant::income_current_reduction();
-        if (m.load_progress >= 1) {
-          auto extracted = Utils::dynamic_unique_cast<missile>(cargo_->extract_payload(component_type::hull));
-          if (extracted) { m.missile_ptr = std::move(extracted); }
-          m.next_action = missile_action::idle;
-        }
-        break;
-      }
-      case missile_action::charge:
-        if (m.missile_ptr->charge(power_)) m.next_action = missile_action::refuel;
-        break;
-      case missile_action::refuel:
-        if (m.missile_ptr->refule(fuel_)) {
-          auto wh = Utils::dynamic_unique_cast<warhead>(cargo_->extract_payload(component_type::warhead));
-          if (wh) {
-            wh->set_carrier_object(m.missile_ptr.get());
-            m.missile_ptr->setup_warhead(std::move(wh));
-          }
-          m.next_action = missile_action::idle;
-          m.is_armed = true;
-        }
-        break;
-      case missile_action::idle:
-      case missile_action::fire:
-        break;
-    }
-  }
+  std::ranges::for_each(loaded_, [this](auto &m) { main_actions_[m.next_action](m); });
 }
 
 void launcher::log_action() const {}
@@ -93,13 +94,77 @@ void launcher::draw() {
 }
 
 void launcher::connect_cargo(std::shared_ptr<base_cargo> cargo) { cargo_ = std::move(cargo); }
-void launcher::load_from_cargo() {
-  this->loaded_.emplace_back(missile_info{.missile_ptr = nullptr,
-                                          .is_armed = false,
-                                          .is_locked = false,
-                                          .is_ready2fire = false,
-                                          .next_action = missile_action::load,
-                                          .load_progress = 0.0});
+void launcher::connect_command_unit(std::shared_ptr<command_unit> &unit) {
+  cunit_ = unit;
+}
+
+auto launcher::evaluate_approaching_time(auto const& target) {
+  auto target_pos = target.last_position();
+
+  return target_pos.r() / NAR_M::missile_parameters::peak_velocity;
+}
+
+void launcher::init_actions() {
+  main_actions_[missile_action::load] = [this](auto &m){
+    auto req = (1.0 - m.load_progress) * LauncherOperationConstant::charge4load() *
+               LauncherOperationConstant::income_current_reduction();
+    auto get = power_.pull(req);
+    m.load_progress += get / req * LauncherOperationConstant::income_current_reduction();
+    if (m.load_progress >= 1) {
+      auto extracted = Utils::dynamic_unique_cast<missile>(cargo_->extract_payload(component_type::hull));
+      if (extracted) { m.missile_ptr = std::move(extracted); }
+      m.next_action = missile_action::idle;
+    }
+  };
+
+  main_actions_[missile_action::charge] = [this](auto &m){
+    if (m.missile_ptr->charge(power_)) m.next_action = missile_action::refuel;
+  };
+
+  main_actions_[missile_action::refuel] = [this](auto &m) {
+    if (m.missile_ptr->refule(fuel_)) {
+      auto wh = Utils::dynamic_unique_cast<warhead>(cargo_->extract_payload(component_type::warhead));
+      if (wh) {
+        wh->set_carrier_object(m.missile_ptr.get());
+        m.missile_ptr->setup_warhead(std::move(wh));
+      }
+      m.next_action = missile_action::idle;
+      m.is_armed = true;
+    }
+  };
+
+  main_actions_[missile_action::lock] = [this](auto &m){
+    if (cunit_->target_selected()) {
+
+      m.lock_info.ignite_time = NAR_M::missile_parameters::ignite_time;
+      m.lock_info.explode_time = evaluate_approaching_time(cunit_->target());
+      m.lock_info.target_position = cunit_->target().last_position();
+      auto vvec = cunit_->target().last_position().in_cartesian();
+      vvec.norm();
+      m.lock_info.target_position = vvec * 0.2;
+
+      m.is_locked = true;
+      m.is_ready2fire = true;
+    }
+    m.next_action = missile_action::idle;
+  };
+
+  main_actions_[missile_action::unlock] = [](auto &m) {
+    m.is_locked = false;
+    m.is_ready2fire = false;
+  };
+
+  main_actions_[missile_action::idle] = [](auto &m) {};
+
+  main_actions_[missile_action::fire] = [](missile_info &m) {
+    if (m.is_ready2fire){
+      auto *nar_ptr = dynamic_cast<NAR_M*>(m.missile_ptr.get());
+      nar_ptr->set_flight_parameter(m.lock_info.ignite_time, m.lock_info.explode_time);
+      nar_ptr->arm();
+
+
+    }
+  };
 }
 
 launcher::~launcher() = default;

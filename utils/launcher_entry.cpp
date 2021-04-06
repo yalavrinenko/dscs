@@ -81,8 +81,10 @@ void gui::launcher_entry::draw_impl() {
         } else {
           if (ImGui::Button(create_title("DISARM", m.callback_index).c_str())) callbacks_.on_disarm(m.callback_index);
         }
+
         ImGui::SameLine();
         if (ImGui::Button(create_title("LOCK", m.callback_index).c_str())) callbacks_.on_lock(m.callback_index);
+
         if (m.ready2fire) {
           ImGui::SameLine();
           if (ImGui::Button(create_title("LAUNCH", m.callback_index).c_str())) callbacks_.on_launch(m.callback_index);

@@ -10,6 +10,7 @@
 #include <deque>
 #include <list>
 #include <vector>
+#include <algorithm>
 
 class tracking_object{
 public:
@@ -64,6 +65,14 @@ public:
 
   [[nodiscard]] auto const& tracked() const {
     return tracked_;
+  }
+
+  [[nodiscard]] auto const& target(size_t uid) const {
+    auto it = std::ranges::find(tracked_, uid, &tracking_object::uid);
+    if (it == tracked_.end())
+      throw std::logic_error("No uid in tracked list");
+    else
+      return *it;
   }
 
 private:

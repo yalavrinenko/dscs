@@ -30,6 +30,7 @@ void command_unit::draw() {
                                       .phi = tp.last_position().phi(),
                                       .velocity = tp.velocity().value_or(polar_vector{0.0, 0.0}),
                                       .acceleration = tp.acceleration().value_or(polar_vector{0.0, 0.0}),
+                                      .lock_target = (current_lock_target_) && tp.uid() == *current_lock_target_,
                                       .trajectory = std::move(prediction)};
 
     gui.long_range_radar_log_->log(p);

@@ -4,6 +4,8 @@
 
 #ifndef DSCS_RADAR_ENTRY_HPP
 #define DSCS_RADAR_ENTRY_HPP
+#include <utility>
+
 #include "gui_entries.hpp"
 
 namespace gui {
@@ -22,14 +24,11 @@ namespace gui {
       double r, phi;
       std::pair<double, double> velocity;
       std::pair<double, double> acceleration;
+      bool lock_target = false;
 
       static auto constexpr TRAJECTORY_POINTS = 1000;
       std::array<std::pair<double, double>, TRAJECTORY_POINTS> trajectory;
     };
-
-    using unary_function = std::function<std::pair<double, double>(int)>;
-
-    static inline double pi() { return std::atan(1.0) * 4.0; }
 
     explicit radar_entry(std::shared_ptr<class logger_window> factory, std::string name, double max_r, size_t segments);
 
@@ -45,9 +44,9 @@ namespace gui {
 
     void set_callbacks(radar_selection_callback on_select, radar_unary_callback on_unlock,
                        radar_unary_callback on_target) {
-      on_select_ = on_select;
-      on_unlock_ = on_unlock;
-      on_target_ = on_target;
+      on_select_ = std::move(on_select);
+      on_unlock_ = std::move(on_unlock);
+      on_target_ = std::move(on_target);
     }
 
   protected:
