@@ -80,6 +80,7 @@ public:
     return control_impl(ts, ship);
   }
 
+  virtual ~icontrol() = default;
 protected:
   virtual std::vector<control_action> control_impl(timestamp const &ts, control_interface &ship) = 0;
 

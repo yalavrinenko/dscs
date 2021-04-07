@@ -19,7 +19,7 @@ struct LauncherOperationConstant{
 
 class launcher: public icomponent{
 public:
-  using launch_callback = std::function<void(pvoid_object &&object, vector_2d const &velocity)>;
+  using launch_callback = std::function<void(pvoid_object object, vector_2d const &velocity)>;
 
   launcher(double mass, std::string name, plogger logger, component_type type, wire power, fuel_pipe pipe,
            size_t launch_pads);
@@ -61,7 +61,8 @@ private:
     charge,
     lock,
     unlock,
-    fire
+    fire,
+    clear
   };
 
   struct missile_info{

@@ -95,7 +95,7 @@ vector_2d small::force(timestamp const &time) {
          engine_system_.slave_engine_[1]->thrust();
 }
 
-void small::equip() {
+void small::equip(world_proxy &&proxy) {
   construct_power_system();
   construct_engine_system();
 
@@ -123,7 +123,7 @@ void small::equip() {
 
   launcher_1->connect_cargo(cargo);
   launcher_1->connect_command_unit(ucontrol);
-  launcher_1->set_launch_environment()
+  launcher_1->set_launch_environment(proxy.object_generation_callback());
 
   bool is_full = false;
   for (auto i = 0; i < 20 && !is_full; ++i) {

@@ -12,9 +12,18 @@ void NAR_M::arm() {
   this->add_control_unit(std::move(controller_));
 }
 
-void NAR_M::set_flight_parameter(double ignite_at, double explode_at) {
-  auto ignite_ts = timestamp(ignite_at / timestamp::delta());
-  auto explode_ts = timestamp(explode_at / timestamp::delta());
+void NAR_M::set_flight_parameter(flight_parameters const& opts) {
+  auto ignite_ts = timestamp(static_cast<size_t>(opts.ignition_time / timestamp::delta()));
+  auto explode_ts = timestamp(static_cast<size_t>(opts.explosion_time / timestamp::delta()));
+
+  auto align_ts = timestamp(1);
+
+  auto align = [name = this->name(), angle = opts.alignment_vector.in_polar().y](icontrol::component_group<pengine> &eng){
+    std::clog << "Align engine in missile " << name << std::endl;
+    eng.apply([angle](pengine &eng) {
+      eng->align(angle);
+    });
+  };
 
   auto ignite = [name = this->name()](icontrol::component_group<pengine> &eng){
     std::clog << "Ignite engine in missile " << name << std::endl;
@@ -26,6 +35,7 @@ void NAR_M::set_flight_parameter(double ignite_at, double explode_at) {
     wh.apply([](pwarhead &wh) { wh->explode(); });
   };
 
+  controller_->add_action(align_ts, align);
   controller_->add_action(ignite_ts, ignite);
   controller_->add_action(explode_ts, explode);
 }

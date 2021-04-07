@@ -26,7 +26,7 @@ public:
                           vector_2d const &velocity);
 
   virtual std::function<void(void_object const*, double)> remove_object_callback();
-  virtual std::function<void(pvoid_object &&object, vector_2d const& velocity)> add_object_callback(pvoid_object const& launcher);
+  virtual std::function<void(pvoid_object, const vector_2d &)> add_object_callback(const void_object *launcher);
 
   virtual void update();
 
@@ -80,6 +80,19 @@ protected:
 
   friend class void_environment;
   friend class em_field;
+};
+
+class world_proxy{
+public:
+  world_proxy(void_map &map, void_object *obj): map_{map}, linked_object_{obj}{
+  }
+
+  decltype(auto) object_generation_callback(){
+    return map_.add_object_callback(linked_object_);
+  }
+private:
+  void_map &map_;
+  void_object const * const linked_object_;
 };
 
 #endif // DSCS_VOID_MAP_HPP

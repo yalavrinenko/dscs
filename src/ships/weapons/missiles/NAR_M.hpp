@@ -10,9 +10,16 @@ class timed_control;
 
 class NAR_M: public missile {
 public:
+
+  struct flight_parameters{
+    double ignition_time{};
+    double explosion_time{};
+    vector_2d alignment_vector;
+  };
+
   NAR_M(std::string name, plogger logger);
 
-  void set_flight_parameter(double ignite_at, double explode_at);
+  void set_flight_parameter(flight_parameters const& opts);
 
   void arm() override;
   ~NAR_M() override;

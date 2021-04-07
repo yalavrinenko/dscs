@@ -11,14 +11,14 @@
 #include "tank/pipe_and_wire.hpp"
 #include "detection/radar.hpp"
 
-class void_map;
+class world_proxy;
 
 class small : public ship_hull{
 public:
   small(std::string name, plogger logger);
   vector_2d force(timestamp const &time) override;
 
-  void equip();
+  void equip(world_proxy &&);
   bool load_cargo(pcomponent &payload);
 
 protected:

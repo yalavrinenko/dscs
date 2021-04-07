@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   auto text_log = factory_ptr->create_logger("S1.ship", 1024 * 10);
   //**************Ship****************************
   auto small_ship = std::make_unique<small>("Ship_S", plogger{text_log, gui_ship});
-  small_ship->equip();
+  small_ship->equip(world_proxy(space, small_ship.get()));
 
   for (std::weakly_incrementable auto i: std::views::iota(0, 20)) {
     std::unique_ptr<icomponent> wh = std::make_unique<warhead>(2.0, "WH-" + std::to_string(i), space.remove_object_callback());

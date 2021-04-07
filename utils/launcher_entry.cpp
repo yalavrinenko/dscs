@@ -3,6 +3,7 @@
 //
 
 #include "launcher_entry.hpp"
+#include <algorithm>
 
 #include <utility>
 void gui::launcher_entry::flush() {
@@ -24,7 +25,8 @@ void gui::launcher_entry::draw_impl() {
     auto color = ImColor(0, 0, 255);
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, (ImVec4) color);
 
-    ImGui::PlotHistogram("", getter, nullptr, info.total - info.loaded.size(), 0, nullptr, 0, 1, ImVec2(200, 60));
+    ImGui::PlotHistogram("", getter, nullptr, static_cast<int>((info.total - info.loaded.size())), 0, nullptr, 0, 1,
+                         ImVec2(200, 60));
 
     ImGui::PopStyleColor(1);
   }
@@ -34,7 +36,10 @@ void gui::launcher_entry::draw_impl() {
     auto color = ImColor(255, 0, 0);
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, (ImVec4) color);
 
-    ImGui::PlotHistogram("", getter, nullptr, info.loaded.size(), 0, nullptr, 0, 1, ImVec2(70, 60));
+    std::vector<float> lm(info.pads, 0);
+    std::fill_n(lm.begin(), info.loaded.size(), 1.0f);
+
+    ImGui::PlotHistogram("", lm.data(), static_cast<int>(info.pads), 0, nullptr, 0, 1, ImVec2(70, 60));
 
     ImGui::PopStyleColor(1);
   }
@@ -71,13 +76,10 @@ void gui::launcher_entry::draw_impl() {
 
         ImGui::NextColumn();
 
-        auto create_title = [](std::string const& title, size_t uid){
-          return (title + "##" + std::to_string(uid));
-        };
+        auto create_title = [](std::string const &title, size_t uid) { return (title + "##" + std::to_string(uid)); };
 
         if (!m.warhead) {
-          if (ImGui::Button(create_title("ARM", m.callback_index).c_str()))
-            callbacks_.on_arm(m.callback_index);
+          if (ImGui::Button(create_title("ARM", m.callback_index).c_str())) callbacks_.on_arm(m.callback_index);
         } else {
           if (ImGui::Button(create_title("DISARM", m.callback_index).c_str())) callbacks_.on_disarm(m.callback_index);
         }

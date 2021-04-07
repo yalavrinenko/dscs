@@ -65,6 +65,7 @@ launcher::launcher(double mass, std::string name, plogger logger, component_type
 
 void launcher::action() {
   std::ranges::for_each(loaded_, [this](auto &m) { main_actions_[m.next_action](m); });
+  loaded_.erase(std::ranges::remove(loaded_, missile_action::clear, &missile_info::next_action).begin(), loaded_.end());
 }
 
 void launcher::log_action() const {}
@@ -78,6 +79,7 @@ void launcher::draw() {
 
   gui::launcher_log_data log_data;
   log_data.total = ((cargo_) ? cargo_->count(component_type::hull) : 0);
+  log_data.pads = launch_pads_;
   for (auto i = 0ul; auto &pl : loaded_) {
     log_data.loaded.emplace_back(gui::launcher_log_data::missile_info{
         .fuel = (pl.missile_ptr) ? pl.missile_ptr->fule() : 0,
@@ -156,13 +158,14 @@ void launcher::init_actions() {
 
   main_actions_[missile_action::idle] = [](auto &m) {};
 
-  main_actions_[missile_action::fire] = [](missile_info &m) {
+  main_actions_[missile_action::fire] = [this](missile_info &m) {
     if (m.is_ready2fire){
       auto *nar_ptr = dynamic_cast<NAR_M*>(m.missile_ptr.get());
-      nar_ptr->set_flight_parameter(m.lock_info.ignite_time, m.lock_info.explode_time);
+      nar_ptr->set_flight_parameter({m.lock_info.ignite_time, m.lock_info.explode_time, m.lock_info.launch_velocity});
       nar_ptr->arm();
 
-
+      on_launch_ (std::move(m.missile_ptr), m.lock_info.launch_velocity);
+      m.next_action = missile_action ::clear;
     }
   };
 }

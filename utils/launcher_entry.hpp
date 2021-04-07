@@ -21,6 +21,7 @@ namespace gui {
     };
     size_t total;
     std::vector<missile_info> loaded;
+    size_t pads;
   };
 
   class launcher_entry: public gui::ilogger_entry {
